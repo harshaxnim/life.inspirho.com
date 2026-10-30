@@ -1,7 +1,7 @@
 # Twenty Sixteen look for the Jekyll copy (developer notes)
 
 ## Goal
-The GitHub Pages copy of life.inspirho.com renders the same HTML and CSS as the WordPress site did, so it looks
+The GitHub Pages copy of the blog (inspirho.com, formerly life.inspirho.com) renders the same HTML and CSS as the WordPress site did, so it looks
 the same at every width. Fonts, sizes, widths, buttons, comments and post navigation were measured against the
 live site with the same browser and match exactly; the only intended differences are listed under *Known limits*.
 
@@ -64,5 +64,5 @@ Blogger posts. `#years` is a view name, not element ids.
   "Leave a comment" links are not shown.
 - The footer credit reads "Proudly hosted on GitHub Pages".
 - Emoji in old comments use the system emoji font instead of WordPress's emoji images.
-- `url:` in `_config.yml` must match the `CNAME` file. GitHub's metadata plugin cannot derive it until the
+- `url:` in `_config.yml` must match the `CNAME` file (`inspirho.com`). GitHub's metadata plugin cannot derive it until the
   repository exists.

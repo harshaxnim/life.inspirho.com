@@ -1,4 +1,4 @@
-# life.inspirho.com
+# inspirho.com
 
 Static (Jekyll) version of the *ins · Π · rho* WordPress blog, built for GitHub Pages.
 
@@ -33,19 +33,21 @@ docker run --rm -it -v "$PWD":/site -v lifegems:/usr/local/bundle -w /site -p 40
 # open http://localhost:4000
 ```
 
-## Publish on GitHub Pages
+## Publishing
 
-```sh
-git add -A && git commit -m "Import blog from WordPress"
-gh repo create harshaxnim/life.inspirho.com --public --source . --push
-gh api -X POST repos/harshaxnim/life.inspirho.com/pages -f "source[branch]=main" -f "source[path]=/"
-```
+The site is the GitHub repository `harshaxnim/life.inspirho.com`, published with GitHub Pages from `main`.
+Every push to `main` rebuilds it in about a minute.
 
-Then point DNS at GitHub: a `CNAME` record for `life` → `harshaxnim.github.io`. The `CNAME` file in this repo
-already tells Pages to serve `life.inspirho.com`. To serve the blog from a different domain (for example the apex
-`inspirho.com`), change both the `CNAME` file and `url:` in `_config.yml`; for an apex domain, DNS needs `A` records
-for GitHub Pages (185.199.108.153, .109.153, .110.153, .111.153) instead of a `CNAME` record. After the certificate is issued, turn on *Enforce HTTPS* in
-the repo's Pages settings.
+Domains (Cloudflare DNS for `inspirho.com`; the import file is kept outside the repository):
+
+| Name | Records | Cloudflare proxy | Role |
+| --- | --- | --- | --- |
+| `inspirho.com` | 4 `A` (185.199.108.153, .109.153, .110.153, .111.153) and 4 `AAAA` (2606:50c0:8000::153 … 8003::153) | Off (grey) | The site. `CNAME` and `url:` in `_config.yml` name this domain. |
+| `www` | `CNAME` → `harshaxnim.github.io` | Off (grey) | GitHub redirects it to `inspirho.com`. |
+| `life` | `CNAME` → `inspirho.com` | On (orange) | A Cloudflare Redirect Rule sends `life.inspirho.com/<path>` to `https://inspirho.com/<path>` (301), so old links keep working. |
+
+GitHub needs the grey-cloud records to issue and renew the HTTPS certificate. To move the site to another domain,
+change the `CNAME` file, `url:` in `_config.yml` and the custom domain in the repository's Pages settings together.
 
 ## Writing new posts
 
