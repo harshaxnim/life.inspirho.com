@@ -1,0 +1,33 @@
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="profile" href="http://gmpg.org/xfn/11">
+<script>(function(html){html.className = html.className.replace(/\bno-js\b/,'js')})(document.documentElement);</script>
+{%- if paginator %}
+<title>{{ site.title }} &#8211; {% if paginator.page > 1 %}Page {{ paginator.page }} &#8211; {% endif %}{{ site.description }}</title>
+{%- else %}
+<title>{{ page.title }} &#8211; {{ site.title }}</title>
+{%- endif %}
+{%- seo title=false %}
+{%- feed_meta %}
+<!-- Same defaults the "Simple MathJax" WordPress plugin used. -->
+<script>
+MathJax = {
+  tex: { inlineMath: [['$','$'],['\\(','\\)']], processEscapes: true },
+  options: { ignoreHtmlClass: 'tex2jax_ignore|editor-rich-text' }
+};
+</script>
+<!-- Stylesheets in the order WordPress printed them. -->
+<link rel="stylesheet" href="{{ '/assets/crayon/css/crayon.min.css' | relative_url }}">
+<link rel="stylesheet" href="{{ '/assets/crayon/x3info-copy.css' | relative_url }}">
+<link rel="stylesheet" href="{{ '/assets/crayon/fonts/droid-sans-mono.css' | relative_url }}">
+<link rel="stylesheet" href="{{ '/assets/css/wp-block-library.css' | relative_url }}">
+<link rel="stylesheet" href="{{ '/assets/css/wp-classic-themes.css' | relative_url }}">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Merriweather%3A400%2C700%2C900%2C400italic%2C700italic%2C900italic%7CMontserrat%3A400%2C700%7CInconsolata%3A400&amp;subset=latin%2Clatin-ext">
+<link rel="stylesheet" href="{{ '/assets/twentysixteen/genericons/genericons.css' | relative_url }}">
+<link rel="stylesheet" href="{{ '/assets/twentysixteen/style.css' | relative_url }}">
+<link rel="stylesheet" href="{{ '/assets/css/wp-inline.css' | relative_url }}">
+<link rel="stylesheet" href="{{ '/assets/css/wp-custom.css' | relative_url }}">
+<link rel="stylesheet" href="{{ '/assets/css/site.css' | relative_url }}">
+<link rel="icon" href="{{ '/wp-content/uploads/2021/05/pi-150x150.png' | relative_url }}" sizes="32x32">
+<link rel="icon" href="{{ '/wp-content/uploads/2021/05/pi-300x300.png' | relative_url }}" sizes="192x192">
+<link rel="apple-touch-icon" href="{{ '/wp-content/uploads/2021/05/pi-300x300.png' | relative_url }}">

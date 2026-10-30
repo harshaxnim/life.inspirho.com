@@ -1,0 +1,9 @@
+---
+layout: default
+---
+{%- comment -%} index.php: the newest posts in full, then paginate_links() (mid_size 1, end_size 1). {%- endcomment -%}
+{% for post in paginator.posts %}
+{% include content.html post=post %}
+{% endfor %}
+
+{% include pagination.html cur=paginator.page last=paginator.total_pages base='/' %}

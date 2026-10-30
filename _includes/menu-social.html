@@ -1,0 +1,5 @@
+<div class="menu-social-container"><ul{% if include.id %} id="{{ include.id }}"{% endif %} class="social-links-menu">
+{%- for item in site.data.menus.social %}
+<li class="menu-item{% if page.url == item.url %} current-menu-item{% endif %}"><a href="{{ item.url | relative_url }}"><span class="screen-reader-text">{{ item.title }}</span></a></li>
+{%- endfor %}
+</ul></div>

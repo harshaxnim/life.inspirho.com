@@ -1,0 +1,22 @@
+title: "ins · Π · rho"
+description: inspired by life et al.
+author: Harsha Reddy
+url: https://life.inspirho.com
+baseurl: ""
+lang: en_US
+
+# Home page: the newest posts in full, 5 per page, at the old WordPress URLs (/page/2/, ...).
+paginate: 5
+paginate_path: "/page/:num/"
+
+plugins:
+  - jekyll-feed
+  - jekyll-seo-tag
+  - jekyll-sitemap
+  - jekyll-redirect-from
+  - jekyll-paginate
+
+twitter:
+  username: harshaxnim
+
+exclude: [README.md, Gemfile, Gemfile.lock, vendor, docs]

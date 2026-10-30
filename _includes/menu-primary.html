@@ -1,0 +1,19 @@
+{%- comment -%} Twenty Sixteen primary menu markup. include.id is set for the header copy only. {%- endcomment -%}
+{%- assign cur_cat = page.categories | first | slugify -%}
+<div class="menu-navigator-container"><ul{% if include.id %} id="{{ include.id }}"{% endif %} class="primary-menu">
+{%- for item in site.data.menus.primary %}
+  {%- assign cls = "menu-item" -%}
+  {%- if page.url == item.url -%}{%- assign cls = cls | append: " current-menu-item" -%}
+  {%- elsif page.layout == "post" and item.url == "/category/" | append: cur_cat | append: "/" -%}{%- assign cls = cls | append: " current-menu-parent" -%}{%- endif -%}
+  {%- if item.children -%}{%- assign cls = cls | append: " menu-item-has-children" -%}{%- endif %}
+<li class="{{ cls }}"><a href="{{ item.url | relative_url }}">{{ item.title }}</a>
+  {%- if item.children %}
+<ul class="sub-menu">
+    {%- for child in item.children %}
+	<li class="menu-item{% if page.url == child.url %} current-menu-item{% endif %}"><a href="{{ child.url | relative_url }}">{{ child.title }}</a></li>
+    {%- endfor %}
+</ul>
+  {%- endif -%}
+</li>
+{%- endfor %}
+</ul></div>

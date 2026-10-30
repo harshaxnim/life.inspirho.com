@@ -1,0 +1,70 @@
+---
+layout: page
+title: All
+permalink: /all/
+redirect_from: [/categories/, /author/admin/, /author/harsh/, /tag/cg/]  # old WordPress archives
+---
+{%- comment -%} Every published post, by year (the default) or by category. Without JavaScript both views show. {%- endcomment -%}
+<nav class="view-switch" aria-label="Arrange posts by">
+	<a href="#years" data-view="years">Years</a>
+	<a href="#categories" data-view="categories">Categories</a>
+</nav>
+
+<section id="view-years" class="post-view">
+	<h2 class="view-title">Years</h2>
+	{%- assign years = site.posts | group_by_exp: "post", "post.date | date: '%Y'" %}
+	{%- for year in years %}
+	<h3 id="y{{ year.name }}">{{ year.name }} <span class="post-count">{{ year.items.size }}</span></h3>
+	<ul class="post-list">
+		{%- for post in year.items %}
+		<li><a href="{{ post.url | relative_url }}">{{ post.title_html | default: post.title }}</a> <span class="post-date">{{ post.date | date: "%B %-d" }}</span></li>
+		{%- endfor %}
+	</ul>
+	{%- endfor %}
+</section>
+
+<section id="view-categories" class="post-view">
+	<h2 class="view-title">Categories</h2>
+	{%- capture names %}{% for cat in site.categories %}{{ cat[0] }}|{% endfor %}{% endcapture %}
+	{%- assign names = names | split: '|' | sort_natural %}
+	{%- for name in names %}
+	{%- assign cat_posts = site.categories[name] %}
+	<h3 id="{{ name | slugify }}"><a href="{{ name | slugify | prepend: '/category/' | append: '/' | relative_url }}">{{ name }}</a> <span class="post-count">{{ cat_posts.size }}</span></h3>
+	<ul class="post-list">
+		{%- for post in cat_posts %}
+		<li><a href="{{ post.url | relative_url }}">{{ post.title_html | default: post.title }}</a> <span class="post-date">{{ post.date | date: "%B %-d, %Y" }}</span></li>
+		{%- endfor %}
+	</ul>
+	{%- endfor %}
+</section>
+
+
+<script>
+(function () {
+	var views = ['years', 'categories'];
+	var root = document.documentElement;
+	function show() {
+		var id = location.hash.slice(1), view = 'years';
+		// #years and #categories pick a view; a category or year anchor
+		// (#cg, #y2016) opens the view that contains it.
+		var target = views.indexOf(id) === -1 && id && document.getElementById(id);
+		if (views.indexOf(id) !== -1) view = id;
+		else if (target && target.closest('.post-view')) view = target.closest('.post-view').id.slice(5);
+		root.setAttribute('data-view', view);
+		document.querySelectorAll('.view-switch a').forEach(function (a) {
+			a.toggleAttribute('aria-current', a.getAttribute('data-view') === view);
+		});
+		if (target) target.scrollIntoView();
+	}
+	window.addEventListener('hashchange', show);
+	// Switching views keeps the page where it is instead of jumping to the section.
+	document.querySelectorAll('.view-switch a').forEach(function (a) {
+		a.addEventListener('click', function (e) {
+			e.preventDefault();
+			history.replaceState(null, '', '#' + a.getAttribute('data-view'));
+			show();
+		});
+	});
+	show();
+})();
+</script>

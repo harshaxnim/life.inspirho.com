@@ -1,0 +1,12 @@
+# The two WordPress users. Posts name theirs with `wp_author:`; posts without it are by `admin`.
+admin:
+  name: Harsha
+  avatar: /assets/images/author-49.jpg
+  avatar2x: /assets/images/author-98.jpg
+  bio_avatar: /assets/images/author-42.jpg
+  bio_avatar2x: /assets/images/author-84.jpg
+  bio: Harsha is not particularly keen on the out-of-body experience of writing in third-person. What a weirdo!
+harsh:
+  name: Harsh
+  avatar: /assets/images/harsh-49.jpg
+  avatar2x: /assets/images/harsh-98.jpg

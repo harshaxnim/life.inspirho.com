@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Maintaining the blog</title>
+<style>body{font:17px/1.7 Georgia,serif;max-width:40em;margin:2em auto;padding:0 16px;color:#1a1a1a;background:#fff}h1,h2{font-family:Montserrat,Helvetica,sans-serif}code,pre{background:#f1f1f1;padding:0 .2em}pre{padding:.8em;overflow:auto}@media (prefers-color-scheme:dark){body{background:#1a1a1a;color:#e6e6e6}code,pre{background:#333}a{color:#9cf}}</style>
+</head><body>
+<h1>Maintaining ins · Π · rho</h1>
+<p>The blog is a set of files in this repository. GitHub Pages turns them into the site every time a change is
+pushed. There is no administration screen.</p>
+<h2>Adding a post</h2>
+<p>Create <code>_posts/YYYY-MM-DD-short-name.md</code>. Write the post in Markdown or HTML under a header like this:</p>
+<pre>---
+layout: post
+title: My new post
+categories: [cg]
+permalink: /cg/my-new-post/
+subtitle: &lt;p&gt;One line shown under the title&lt;/p&gt;
+---</pre>
+<p>The post then appears on the home page, in its category and on the All page.</p>
+<h2>Changing the menu</h2>
+<p>Edit <code>_data/menus.yml</code>. <code>primary</code> is the menu at the top and bottom of every page.
+<code>social</code> is the list of social links, and its icons are chosen from each link's address.</p>
+<h2>Posts per page on the home page</h2>
+<p>Change <code>paginate: 5</code> in <code>_config.yml</code>.</p>
+<h2>Moving to another domain</h2>
+<p>Change the <code>CNAME</code> file and <code>url:</code> in <code>_config.yml</code> together, then update DNS as the
+README describes.</p>
+<h2>Checking a change before publishing</h2>
+<p>Run the preview command from the README and open <code>http://localhost:4000</code>.</p>
+</body></html>

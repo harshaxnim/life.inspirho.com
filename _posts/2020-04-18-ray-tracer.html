@@ -1,0 +1,61 @@
+---
+layout: post
+status: publish
+published: true
+title: Round ‘n’ Round – Ray Tracer
+excerpt: An interactive ray tracing tutorial/experience!
+wordpress_id: 277
+date: 2020-04-18 16:16:17 +0000
+categories:
+- cg
+tags: []
+permalink: /cg/ray-tracer/
+title_html: <em>Round &#8216;n&#8217; Round</em> – Ray Tracer
+subtitle: <p>An interactive ray tracing tutorial/experience!</p>
+---
+<p><a href="https://github.com/harshaxnim/ray"></a>I would love to start every story with &#8220;<em>From the time immemorial&#8230;</em>&#8221; which lets me, as a poignant story-teller, build everything up with impeccable detail and dwell over stuff with such precise accuracy that it would <em>blah blah blah</em>&#8230;</p>
+
+
+
+<p>I was already on the edge of implementing a ray-tracer, and with all the hype about real time raytracing with NVIDIA&#8217;s RTX series and <a rel="noreferrer noopener" aria-label=" (opens in a new tab)" href="https://youtu.be/J3ue35ago3Y" target="_blank">Unreal&#8217;s Raytracing Demo</a>, I was <em>pushed</em> to writing my own little ray tracer. You can find the <a href="https://github.com/harshaxnim/ray">entire source code here</a>.</p>
+
+
+
+<script>
+enabled = false
+function rayTracerEmbedOnClick() {
+  var ray = document.getElementById('ray-iframe');
+  var ray_button = document.getElementById('ray-button');
+  if (!enabled) {
+    ray.style.display = "block";
+    ray.src = "{{ site.baseurl }}/ray/";
+    ray_button.innerHTML = "Click to unload the Ray Tracer!";
+  }
+  if (enabled) {
+    ray.style.display = "none";
+    ray.src = "about:blank";
+    ray_button.innerHTML = "Click to load the Ray Tracer!";
+  }
+  enabled = !enabled;
+}
+</script>
+
+<button id="ray-button" onclick="rayTracerEmbedOnClick()" style="margin-bottom:30px">Click to load the Ray Tracer!</button>
+<iframe loading="lazy" id="ray-iframe" src="" style="display:none;width:100%;max-width:600px;height:auto;aspect-ratio:1/1" height="600" width="600" frameborder="0">
+</iframe>
+
+
+
+<p>Here&#8217;s my attempt at making a modular ray tracer in JS. I have chosen JS for this particular project because: firstly, it&#8217;s easy to showcase; secondly, it provides me the flexibility of remote development. I used an online IDE called CodeAnywhere, which makes it really easy to code from anywhere, literally. I just have to set-up my server (which has the code) with SSH and I am good to go. Say I go to a friends place, I get bored. I log into codeanywhere.com and off I go coding away! Also, it&#8217;s such a breeze to test it given that this is a remote development set-up. I just open the website where I am hosting the code. Voilà.</p>
+
+
+
+<p>Coming back to what this post is about, a ray tracing is a rendering technique where we generate the output images by tracing the path of the rays of light. Of course we cannot simulate every light ray, so we do some optimisations (read trade-offs). One such optimisation is: instead of casting rays from the light where most of the rays might not even hit the camera (which would result in wasted computations), we <em>reverse</em> trace the path the light would have taken if it hits a pixel on our viewport. Another level of optimisation (again, read tradeoff) which I have used in my case, but isn&#8217;t usually done if better results are desired is this: we cast only a single ray per pixel. We consider FOV and aperture of the camera to construct a ray for every pixel and trace it.</p>
+
+
+
+<p><em>Tracing</em> is basically just seeing where the trace line hits (intersects) an object, let&#8217;s call it P. Based on face on the object, a primary color can be picked. To get the illumination, P is checked for its visibility from the light sources. If yes, how far and at what angle is the light from the object is taken into consideration to conclude the illumination of the point, P. For reflections, we calculate the angle of reflection based on the <em>law of reflections</em> and continue to trace the new reflected line to check for new intersections. If there&#8217;s an intersection, we repeat the above logic to get the color of the point. This parameter of levels of recursive reflection can be decided as desired. Usually, human mind does not notice if there are reflections beyond three levels, so that can be taken as a standard for our little ray tracer.</p>
+
+
+
+<p>This amount of thought should be enough to come up with a toy tracer. One thing that can be noted is that we can achieve more materials like metallic look by slightly multiplying the <em>normals</em> at point P with seeded random numbers.</p>

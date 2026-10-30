@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<style>
+	body {
+		background-color: #333;
+	}
+	#c {
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		transform: translate(-50%, -50%);
+
+		/* Renders at 600x600; shown smaller when the frame is narrower. */
+		width: min(600px, 100vw, 100vh);
+		height: min(600px, 100vw, 100vh);
+
+		box-shadow: 0px 0px 100px #222;
+	}  
+</style>
+<body>
+  
+  <canvas id="c" width="600" height="600"></canvas>
+  <script src="js/vector.js"></script>
+  <script src="js/tracer.js"></script>
+
+</body>
+</html>

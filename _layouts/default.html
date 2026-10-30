@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en-US" class="no-js">
+<head>
+{% include head.html %}
+</head>
+{%- if paginator -%}
+  {%- assign body_class = "home blog hfeed" -%}
+{%- elsif page.layout == "post" -%}
+  {%- capture body_class %}post-template-default single single-post postid-{{ page.wordpress_id }} single-format-standard{% endcapture -%}
+{%- elsif page.layout == "archive" -%}
+  {%- capture body_class %}archive category category-{{ page.category | slugify }} hfeed{% endcapture -%}
+{%- elsif page.permalink == "/404.html" -%}
+  {%- assign body_class = "error404" -%}
+{%- else -%}
+  {%- capture body_class %}page-template-default page{% if page.wordpress_id %} page-id-{{ page.wordpress_id }}{% endif %}{% endcapture -%}
+{%- endif %}
+<body class="{{ body_class }} custom-background custom-background-image group-blog no-sidebar">
+<div id="page" class="site">
+	<div class="site-inner">
+		<a class="skip-link screen-reader-text" href="#content">Skip to content</a>
+
+		{% include header.html %}
+
+		<div id="content" class="site-content">
+
+	<div id="primary" class="content-area">
+		<main id="main" class="site-main" role="main">
+{{ content }}
+		</main><!-- .site-main -->
+	</div><!-- .content-area -->
+
+		</div><!-- .site-content -->
+
+		{% include footer.html %}
+	</div><!-- .site-inner -->
+</div><!-- .site -->
+
+<script src="{{ '/assets/js/jquery.min.js' | relative_url }}"></script>
+<script>var screenReaderText = {"expand":"expand child menu","collapse":"collapse child menu"};</script>
+<script>var CrayonSyntaxSettings = {"version":"_2.7.2_beta","is_admin":"0","ajaxurl":"","prefix":"crayon-","setting":"crayon-setting","selected":"crayon-setting-selected","changed":"crayon-setting-changed","special":"crayon-setting-special","orig_value":"data-orig-value","debug":""};
+var CrayonSyntaxStrings = {"copy":"Press %s to Copy, %s to Paste","minimize":"Click To Expand Code"};</script>
+<script src="{{ '/assets/crayon/crayon.min.js' | relative_url }}"></script>
+<script src="{{ '/assets/twentysixteen/js/functions.js' | relative_url }}"></script>
+<script src="{{ '/assets/twentysixteen/js/skip-link-focus-fix.js' | relative_url }}"></script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-chtml.js"></script>
+</body>
+</html>

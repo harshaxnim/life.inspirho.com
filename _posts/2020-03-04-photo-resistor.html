@@ -1,0 +1,77 @@
+---
+layout: post
+status: publish
+published: true
+title: photo_resistor
+excerpt: A Mono-Pixel Camera
+wordpress_id: 340
+date: 2020-03-04 15:32:17 +0000
+categories:
+- diy
+tags: []
+permalink: /diy/photo-resistor/
+subtitle: <p>A Mono-Pixel Camera</p>
+---
+<p>Ever wanted to take a photo from a single photoresistor? Of course, you have; who hasn&#8217;t? (/s)</p>
+
+
+
+<p>With a million dreams gleaming in my eyes and 0.000001 million pixels mounted on my servos, I present to you, the <em>photo_resistor!</em><br></p>
+
+
+
+<figure class="wp-block-video aligncenter"><video autoplay loop muted src="{{ site.baseurl }}/wp-content/uploads/2020/03/photo-resistor-in-action-compressed.mp4"></video><figcaption class="wp-element-caption"><em>Tada!</em></figcaption></figure>
+
+
+
+<p>TL; DR: this is a photoresistor stuck on a pan-tilt servo mount controlled by an Arduino Nano with information being transferred via the HC-05 Bluetooth module.</p>
+
+
+
+<p>If you&#8217;re running wild with your imagination about how the output of this dingus of a device would look like, let me help you get back to the ground: imagine a camera sensor which is the king of the <a href="https://en.wikipedia.org/wiki/Rolling_shutter">Rolling shutter</a>, with a <em>minimum</em> &#8220;shutter speed&#8221; of about 15s, has an anorexically low ISO (sensor sensitivity), a dead fish&#8217;s eye distortion and has an inbuilt blur-filter (take that Instagram camera!). Well, this is basically it. If you stop squinting, you should see a clear picture of the tube-light being captured using the beloved <em>photo_resistor</em> below. I said stop squinting your eyes!</p>
+
+
+
+<figure class="wp-block-video"><video autoplay loop muted src="{{ site.baseurl }}/wp-content/uploads/2020/03/illustrate2hq.mp4"></video></figure>
+
+
+
+<p>While I had been playing around with the idea for some time now, with some free time on my hands, I finally got around to materialise this contraption. Let&#8217;s break this down to simpler modules; this could be divided into five clearly defined modules. The microcontroller had these responsibilities: reading the light intensity value, controlling the servo, transferring the information via Bluetooth. The PC had to do these: read the data over Bluetooth, render the scanned image. For <em>photo_resistor</em> to work there&#8217;s one last thing that needs to be taken care of: the way the light falls onto the photoresistor.</p>
+
+
+
+<div class="wp-block-media-text alignwide is-stacked-on-mobile"><figure class="wp-block-media-text__media"><img decoding="async" loading="lazy" width="1024" height="1020" src="{{ site.baseurl }}/wp-content/uploads/2020/03/allDirsIllus_whiteBack-1024x1020.png" alt="" class="wp-image-369 size-full" srcset="{{ site.baseurl }}/wp-content/uploads/2020/03/allDirsIllus_whiteBack-1024x1020.png 1024w, {{ site.baseurl }}/wp-content/uploads/2020/03/allDirsIllus_whiteBack-150x150.png 150w, {{ site.baseurl }}/wp-content/uploads/2020/03/allDirsIllus_whiteBack-300x300.png 300w, {{ site.baseurl }}/wp-content/uploads/2020/03/allDirsIllus_whiteBack-768x765.png 768w, {{ site.baseurl }}/wp-content/uploads/2020/03/allDirsIllus_whiteBack-1200x1195.png 1200w, {{ site.baseurl }}/wp-content/uploads/2020/03/allDirsIllus_whiteBack.png 1305w" sizes="(max-width: 709px) 85vw, (max-width: 909px) 67vw, (max-width: 1362px) 62vw, 840px" /></figure><div class="wp-block-media-text__content">
+<p>By default, the light rays fall from all directions onto the photoresistor. This will end up polluting our readings and make the final captured image a blurry mess.</p>
+</div></div>
+
+
+
+<div class="wp-block-media-text alignwide has-media-on-the-right is-stacked-on-mobile"><div class="wp-block-media-text__content">
+<p>So, we encase the photoresistor with a cylindrical pipe with <em>non-reflective</em> interiors walls. The pipe will act like a <em>reverse-laser</em>, making sure that the light rays falling straight onto the photoresistor at ~90° angles hits it directly and the other rays reflect off the almost-non-reflective walls multiple times and die down in amplitude by the time it reaches the photoresistor. The actual pipe I used was a black sheet of paper rolled into a cylinder.</p>
+</div><figure class="wp-block-media-text__media"><img decoding="async" loading="lazy" width="571" height="1024" src="{{ site.baseurl }}/wp-content/uploads/2020/03/uniDirIllus_whiteBack-571x1024.png" alt="" class="wp-image-370 size-full" srcset="{{ site.baseurl }}/wp-content/uploads/2020/03/uniDirIllus_whiteBack-571x1024.png 571w, {{ site.baseurl }}/wp-content/uploads/2020/03/uniDirIllus_whiteBack-167x300.png 167w, {{ site.baseurl }}/wp-content/uploads/2020/03/uniDirIllus_whiteBack-768x1378.png 768w, {{ site.baseurl }}/wp-content/uploads/2020/03/uniDirIllus_whiteBack.png 1008w" sizes="(max-width: 571px) 85vw, 571px" /></figure></div>
+
+
+
+<p>I got down to building each module individually and started putting them together like a car would get assembled on an assembly line. Everything fit in smoothly, servos would move on command, HC-05 would send the data as requested, the python script would receive the data just fine and render the received data. Perfect! I couldn&#8217;t have asked for more.</p>
+
+
+<div class="wp-block-image">
+<figure class="aligncenter is-resized"><img decoding="async" loading="lazy" src="{{ site.baseurl }}/wp-content/uploads/2020/03/so_good.png" alt="" class="wp-image-351" width="124" height="118"/></figure></div>
+
+
+<p>So, conceptually, if I turn the ignition key of my contraption on, it should just work, right? Wrong. The reality is a bitch, innit? While all of my LEGO-like modules were fitting in LEGO-like gloves, it dawned on me that <em>hobbyist</em> servos with <em>hobbyist</em> photoresistors present us with <em>first-rate</em> challenges! I realised that the photoresistor readings had considerable noise and laughable sensitivity. While this did not really come to me as a surprise, what did catch me off-guard though was that the servo had an offset of up to 10° between the time when the armature is moving up vs. the time it is moving down. This resulted in images that looked like how some of the <a href="https://en.wikipedia.org/wiki/Interlaced_video#/media/File:Interlaced_video_frame_(car_wheel).jpg">old movies would look if they had the Interlacing Problem</a>.</p>
+
+
+<div class="wp-block-image">
+<figure class="aligncenter"><img decoding="async" loading="lazy" width="434" height="426" src="{{ site.baseurl }}/wp-content/uploads/2020/03/interlacingIssue.png" alt="" class="wp-image-376" srcset="{{ site.baseurl }}/wp-content/uploads/2020/03/interlacingIssue.png 434w, {{ site.baseurl }}/wp-content/uploads/2020/03/interlacingIssue-300x294.png 300w" sizes="(max-width: 434px) 85vw, 434px" /><figcaption class="wp-element-caption"><em>photo_resistor</em>&#8216;s rendition of <em>A Starry Night</em><br>or<br>How the shitty servos screwed up my photo</figcaption></figure></div>
+
+
+<p>I spent over a day figuring out what had gone wrong before finally concluding that this is an act of god over which I have no jurisdiction. So I turned to the golden answer any Indian would resort to in times of dire necessity, <em>Jugaad</em>. I just added an offset in my code to handle my servos&#8217; atrocity. All in all, it worked out just fine as you can see in the second video above and I lived happily ever after.</p>
+
+
+
+<hr class="wp-block-separator has-css-opacity"/>
+
+
+
+<p>You can find <a href="https://github.com/harshaxnim/photo_resistor">all of my code here</a>. </p>

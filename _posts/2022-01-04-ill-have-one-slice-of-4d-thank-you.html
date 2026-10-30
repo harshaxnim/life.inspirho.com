@@ -1,0 +1,532 @@
+---
+layout: post
+status: publish
+published: true
+title: An ode to Affine Transformations
+excerpt: I’ll have one slice of 4D, thank you!
+wordpress_id: 405
+date: 2022-01-04 08:06:28 +0000
+categories:
+- cg
+tags:
+- cg
+permalink: /cg/ill-have-one-slice-of-4d-thank-you/
+subtitle: <p>I&#8217;ll have one slice of 4D, thank you!</p>
+---
+<script type="importmap">
+  {
+    "imports": {
+      "three": "{{ site.baseurl }}/assets/vendor/three/three.module.js",
+      "three/addons/": "{{ site.baseurl }}/assets/vendor/three/addons/"
+    }
+  }
+</script>
+
+<script type="module">
+  import * as THREE from "three";
+
+  if(typeof ThreeRender !== "function")
+  {
+    window.ThreeRender = class {
+      constructor(elementId) {
+        this.canvas = document.getElementById(elementId);
+        this.canvas.style.height = this.canvas.style.width;
+        this.canvas.width  = this.canvas.offsetWidth;
+        this.canvas.height = this.canvas.offsetWidth;
+      }
+
+      animate() {
+          requestAnimationFrame(()=>this.animate());
+          this.manipulate();
+          this.renderer.render(this.scene, this.camera);
+      }
+
+      manipulate() {
+        this.mesh.rotation.x += 0.0002;
+        this.mesh.rotation.y += 0.0002;
+        this.mesh.rotation.z += 0.0002;
+      }
+
+      setup() {
+        this.camera = new THREE.OrthographicCamera( -400, 400, 400, -400, 1, 1000 );
+        this.camera.position.z = 400;
+        this.camera.lookAt(new THREE.Vector3(0,0,0));
+        this.scene.add(this.camera);
+
+        var geometry = new THREE.SphereGeometry(300);
+        var material = new THREE.LineBasicMaterial( {color: 0x666666} );
+
+        this.mesh = new THREE.LineSegments( geometry, material );
+        this.scene.add( this.mesh );
+      }
+
+      render() {
+        this.scene = new THREE.Scene();
+        this.renderer = new THREE.WebGLRenderer( { canvas: this.canvas, antialias: true, alpha: true, stencil: true} );
+        this.renderer.setClearColor( 0x000000, 0 );
+        this.setup();
+        this.animate();
+      }
+
+    };
+  }
+</script>
+
+
+
+
+<h2><em>Prologue</em><br></h2>
+
+
+
+<p class="has-drop-cap">Almost every render you see today, be it in a game, in a movie, or your favourite graphics application, you are witnessing the result of a really cool technique that takes those 3D objects, &#8220;expands&#8221; it into a 4D realm, twists and turns the objects in the fourth dimension, and ultimately extracts a slice of it, all so that you can witness your friend vroom past you in Mario Kart™ in full 3D glory. Wut? Why do we have to enter this realm of 4 dimensions you ask? You have come to the right place, my friend, where we talk about matrices, <a href="#4d_second">what they can do for us</a>, <a href="#4d_third">what they cannot</a> (<em>jump here if you have witnessed the glory of matrices already</em>), and <a href="#4d_fourth">how we overcome</a> their limitation.</p>
+
+
+
+<p>Let us take a look at this tiny and abundantly common example:</p>
+
+
+
+<canvas id="4d_first" style="background: transparent; width: 100%; height: 1px; display: block;"></canvas><br>
+
+
+
+<script type="module">
+import * as THREE from 'three';
+var myCanvasRenderer = new window.ThreeRender('4d_first');
+
+myCanvasRenderer.setup = function() {
+  this.camera = new THREE.PerspectiveCamera( 60, 1, 1, 1000 );
+  this.camera.position.z = 200;
+  // this.camera.position.y = -200;
+  // this.camera.position.x = 100;
+  this.camera.up = new THREE.Vector3(0,0,1);
+  this.camera.lookAt(new THREE.Vector3(0,0,0));
+  this.scene.add(this.camera);
+  
+  var geometry = new THREE.BoxGeometry( 100, 100, 0.01 );
+  var material = new THREE.MeshBasicMaterial( {depthTest:false, color: 0xff6666} );
+  this.plane = new THREE.Mesh( geometry, material );
+  this.plane.matrixAutoUpdate=false;
+  this.scene.add(this.plane);
+
+  this.grid = new THREE.Mesh(new THREE.BoxGeometry(200, 200, .1),
+                             new THREE.MeshBasicMaterial({depthTest:false, color: 0x666666, opacity: 0.3, transparent:true})
+                            );
+  this.grid.matrixAutoUpdate=false;
+  this.scene.add(this.grid);
+};
+
+myCanvasRenderer.manipulate = function() {
+  var theta = 0.002;
+  var mat = new THREE.Matrix4().set(
+       Math.cos(theta), -Math.sin(theta), 0, 0,
+       Math.sin(theta), Math.cos(theta), 0, 0,
+       0, 0, 1, 0,
+       0, 0, 0, 1);
+  this.plane.applyMatrix4(mat);
+}
+
+myCanvasRenderer.render();
+</script>
+
+
+
+<p>Let&#8217;s consider the four corner points of this mesh. Say, they are at points $(x, y)$. To create an animation as shown above, we need move the points around the origin, $(0, 0)$. Say we are required to move by an angle $\theta$ every frame. Using a tad bit of trigonometry and jumping onto the complex plane, if the current point $(x, y)$ be written as $k\cdot e^{i\alpha}$, we have the new point $(x&#8217;, y&#8217;)$ which is rotated by $\theta$ radians as:<br>$$\begin{eqnarray}<br>k \cdot e^{i \beta} &amp;=&amp; k\cdot e^{i(\alpha + \theta)} \\<br>&amp;=&amp; k\cdot e^{i\alpha} \cdot e^{i\theta} \\<br>&amp;=&amp; k \cdot (\cos \alpha + i\sin \alpha) \cdot \\<br>&amp; &amp; (\cos \theta + i\sin \theta) \\<br>&amp;=&amp; (x + iy) \cdot (\cos \theta + i\sin \theta) \\<br>x&#8217;+iy&#8217;&amp;=&amp; (x \cos \theta &#8211; y \sin \theta) +\\<br>&amp; &amp; i(y \cos \theta + x \sin \theta)<br>\end{eqnarray}$$<br>Dissociating the real and complex parts:<br>$$\begin{eqnarray}<br>x&#8217; &amp;=&amp; x \cos \theta &amp;-&amp; y \sin \theta \\<br>y&#8217; &amp;=&amp; x \sin \theta &amp;+&amp; y \cos \theta<br>\end{eqnarray}$$<br>So we can place the points in their new coordinates every frame according to our equation here and we would end up with an animation shown above, where the points would be rotating about the origin by $\theta$ every frame.</p>
+
+
+
+<p>Another way of writing the same equation is:<br>$$<br>\begin{bmatrix}<br>x&#8217;\\<br>y&#8217;<br>\end{bmatrix}<br>=<br>\begin{bmatrix}<br>\cos \theta &amp; -\sin \theta\\<br>\sin \theta &amp; \cos \theta<br>\end{bmatrix}<br>\cdot<br>\begin{bmatrix}<br>x\\<br>y<br>\end{bmatrix}<br>$$ If we multiply the matrices on the right hand side of this equation, we see that it&#8217;s the same old wine, just in a new bottle:<br>$$<br>\begin{bmatrix}<br>x&#8217;\\<br>y&#8217;<br>\end{bmatrix}<br>=<br>\begin{bmatrix}<br>x \cos \theta &amp;-&amp; y \sin \theta\\<br>x \sin \theta &amp;+&amp; y \cos \theta<br>\end{bmatrix}<br>$$<br></p>
+
+
+
+<h2><em>Part I<br></em>Rise of the Planet of the Matrices</h2>
+
+
+
+<p>Then, why would we bother writing a perfectly fine equation as a matrix multiplication? While matrices are not mathemagic, they definitely are a convenience. Please, allow me to demonstrate.</p>
+
+
+
+<p>Say our new task is to both rotate and scale a square like this:</p>
+
+
+
+<canvas id="4d_second" style="background: transparent; width: 100%; height: 1px; display: block;"></canvas><br>
+
+
+
+<script type="module">
+import * as THREE from 'three';
+var myCanvasRenderer = new window.ThreeRender('4d_second');
+
+myCanvasRenderer.setup = function() {
+  this.camera = new THREE.PerspectiveCamera( 60, 1, 1, 1000 );
+  this.camera.position.z = 200;
+  // this.camera.position.y = -200;
+  // this.camera.position.x = 100;
+  this.camera.up = new THREE.Vector3(0,0,1);
+  this.camera.lookAt(new THREE.Vector3(0,0,0));
+  this.scene.add(this.camera);
+  
+  var geometry = new THREE.BoxGeometry( 100, 100, 0.01 );
+  var material = new THREE.MeshBasicMaterial( {depthTest:false, color: 0xff6666} );
+  this.plane = new THREE.Mesh( geometry, material );
+  this.plane.matrixAutoUpdate=false;
+  this.scene.add(this.plane);
+
+  this.grid = new THREE.Mesh(new THREE.BoxGeometry(200, 200, .1),
+                             new THREE.MeshBasicMaterial({depthTest:false, color: 0x666666, opacity: 0.3, transparent:true})
+                            );
+  this.grid.matrixAutoUpdate=false;
+  this.scene.add(this.grid);
+
+};
+
+myCanvasRenderer.manipulate = function() {
+  if(this.plane.scale.y>1.3) this.flip = true;
+  else if(this.plane.scale.y<0.7) this.flip = false;
+  var theta = this.flip ? -0.002 : 0.002;
+  var s = this.flip ? 0.999 : 1.001;
+  var mat = new THREE.Matrix4().set(
+       s*Math.cos(theta), -Math.sin(theta), 0, 0,
+       Math.sin(theta), s*Math.cos(theta), 0, 0,
+       0, 0, 1, 0,
+       0, 0, 0, 1);
+  this.plane.applyMatrix4(mat);
+}
+
+myCanvasRenderer.render();
+</script>
+
+
+
+<p class="has-very-light-gray-background-color has-background">Scaling matrix can be created similar to how the rotation matrix was created above. We can trivially observe the following equation to be true:<br>$$<br>\begin{bmatrix}<br>x'\\<br>y'<br>\end{bmatrix}<br>=<br>\begin{bmatrix}<br>s_x &amp; 0\\<br>0 &amp; s_y<br>\end{bmatrix}<br>\cdot<br>\begin{bmatrix}<br>x\\<br>y<br>\end{bmatrix}<br>\\<br>=<br>\begin{bmatrix}<br>s_x\cdot x\\<br>s_y\cdot y<br>\end{bmatrix}<br>$$ where $s_x$ and $s_y$ are $x$ scaling and $y$ scaling factors respectively.</p>
+
+
+
+<p>To achieve multiple transformations (rotation and scaling as seen above), we can take a shortcut; instead of applying rotation matrix first and then applying the scaling matrix, we can just multiply corresponding matrices together like so and apply it once on the points:<br>$$<br>\begin{bmatrix}<br>s_x &amp; 0\\<br>0 &amp; s_y<br>\end{bmatrix} \cdot<br>\begin{bmatrix}<br>\cos \theta &amp; -\sin \theta\\<br>\sin \theta &amp; \cos \theta<br>\end{bmatrix}$$ How cool is that?! You can chain as many transformations as you please. Imagine the possibilities! If you have a thousand points and a hundred transformations that you want to apply these transformations to; you could apply hundred transformations on each point, resulting in 100*1000 matrix multiplications, or, you can "collapse" transformations into one matrix, by multiplying the hundred matrices together, and finally multiply this matrix with the thousand points. To put things in perspective, this shortcut solves such a problem in 10 minutes, as opposed to taking more than 24 hours using the older method (assuming a second per matrix multiplication). There are a bunch of other nice things about matrices making them our ultimate choice for a variety of tasks, ranging from computer graphics to machine learning.</p>
+
+
+
+<p>Okay, so matrices do have a few tricks up their sleeves. Can we use matrices for any transformation? The answer is, no. But before we go there, let's get a feel for what a 2D matrix allows us to do. Below is a demo with a $2 \times 2$ matrix represented as sliders:</p>
+
+
+
+<canvas id="4d_third" style="background: transparent; width: 100%; height: 1px; display: block;"></canvas><br>
+<table class="l1 wp-block-table aligncenter" style="border: none;">
+<tbody>
+  <tr><td>
+<input type="range" min="0" max="200" value="100" class="slider" id="third_11">
+</td>
+<td><input type="range" min="-100" max="100" value="0" class="slider" id="third_12"></td></tr>
+  <tr><td><input type="range" min="-100" max="100" value="0" class="slider" id="third_21"></td>
+<td><input type="range" min="0" max="200" value="100" class="slider" id="third_22"></td></tr>
+</tbody>
+</table>
+<input class="aligncenter" onclick="(function ()
+{
+document.getElementById('third_11').value=100;
+document.getElementById('third_12').value=0;
+document.getElementById('third_21').value=0;
+document.getElementById('third_22').value=100;
+})();" type="reset" value="Reset">
+
+
+
+<script type="module">
+import * as THREE from 'three';
+var myCanvasRenderer = new window.ThreeRender('4d_third');
+
+myCanvasRenderer.setup = function() {
+  this.camera = new THREE.PerspectiveCamera( 60, 1, 1, 1000 );
+  this.camera.position.z = 200;
+  // this.camera.position.y = -200;
+  // this.camera.position.x = 100;
+  this.camera.up = new THREE.Vector3(0,0,1);
+  this.camera.lookAt(new THREE.Vector3(0,0,0));
+  this.scene.add(this.camera);
+  
+  var geometry = new THREE.BoxGeometry( 100, 100, 0.01 );
+  var material = new THREE.MeshBasicMaterial( {depthTest:false, color: 0xff6666} );
+  this.plane = new THREE.Mesh( geometry, material );
+  this.plane.matrixAutoUpdate=false;
+  this.scene.add(this.plane);
+
+  this.grid = new THREE.Mesh(new THREE.BoxGeometry(200, 200, .1),
+                             new THREE.MeshBasicMaterial({depthTest:false, color: 0x666666, opacity: 0.3, transparent:true})
+                            );
+  this.grid.matrixAutoUpdate=false;
+  this.scene.add(this.grid);
+};
+
+myCanvasRenderer.manipulate = function() {
+this.plane.matrix.set(
+        document.getElementById("third_11").value/100, document.getElementById("third_12").value/100, 0, 0,
+        document.getElementById("third_21").value/100, document.getElementById("third_22").value/100, 0, 0,
+        0, 0, 1, 0,
+        0, 0, 0, 1
+       );
+}
+myCanvasRenderer.render();
+</script>
+
+
+
+<p>Playing around with the 2D matrix, we can make a bunch of observations:<br>• top left and bottom right elements scale our square like we expected.<br>• top right and bottom left elements "shear" the square. But more importantly, we can use a combination of the two shears to rotate the object, albeit with some unintended scaling.<br>• We can of course fix the scaling my using the first step to ensure the object remains the same size. This is essentially what happens during rotation: $\cos\theta$ and $\sin\theta$ are playing around to ensure shearing and re-scaling ultimately resulting is rotation.<br>• Ultimately, we soon realise that the square is always anchored to the center.</p>
+
+
+
+<p>It's so dull, we could say our square is rather, <em>square!</em> In using matrices, we are limiting ourselves to a subset of transformations called <em>Linear Transformations</em>. TL;DR, linear transformations are the kind of transformations that preserve the origin. If you notice the square in the widget above, its origin is never transformed, it is anchored to the same point irrespective of how the other points move around it. So, how in the world do we move our dear squarie if 2D matrices do not allow "translations"?!</p>
+
+
+
+<p>Let's evaluate our options. We can of course add the translation vector $(t_x, t_y)$ post matrix multiplication like so:<br>$$<br>\begin{bmatrix}<br>x'\\<br>y'<br>\end{bmatrix}<br>=<br>\begin{bmatrix}<br>t_x\\<br>t_y<br>\end{bmatrix}<br>+<br>\begin{bmatrix}<br>a &amp; b\\<br>c &amp; d<br>\end{bmatrix}<br>\cdot<br>\begin{bmatrix}<br>x\\<br>y<br>\end{bmatrix}<br>$$ but if we do this, we would lose out on all of the sweet matrix properties such as chaining etc. So, this idea is out.</p>
+
+
+
+<p>Back to the drawing board! So matrices allow only a certain kind of transformations as seen in the demo above, where the points move around the origin. Let's think about what linear transformations mean in the next dimension!</p>
+
+
+
+<h2><em>Part II<br></em>The Prodigal Mathematician</h2>
+
+
+
+<p>A mathematician does not play miser when it comes to dimensions! So off we go adding another dimension to our square problem, resulting in a stack of squares, or a cuboid; let us now apply linear transformations to the cuboid. We can imagine the cuboid transforming around the origin akin to how the square did, i.e., with no translations. If we take a slice of the cube at  plane parallel to the $x-y$ plane, we will see this <em>(feel free to change the camera by dragging on the canvas)</em>:</p>
+
+
+
+<canvas id="4d_fourth" style="background: transparent; width: 100%; height: 1px; display: block;"></canvas>
+<table class="l1 wp-block-table aligncenter" style="border: none;">
+<tbody>
+  
+  <tr>
+    <td>
+      <input type="range" min="0" max="200" value="100" class="slider" id="4d_fourth_a">
+    </td>
+    <td>
+      <input type="range" min="-100" max="100" value="0" class="slider" id="4d_fourth_b">
+    </td>
+    <td>
+      <input type="range" min="-100" max="100" value="0" class="slider" id="4d_fourth_c">
+    </td>
+  </tr>
+
+  <tr>
+    <td>
+      <input type="range" min="-100" max="100" value="0" class="slider" id="4d_fourth_d">
+    </td>
+    <td>
+      <input type="range" min="0" max="200" value="100" class="slider" id="4d_fourth_e">
+    </td>
+    <td>
+      <input type="range" min="-100" max="100" value="0" class="slider" id="4d_fourth_f">
+    </td>
+  </tr>
+
+  <tr>
+    <td>
+      <input type="range" min="-100" max="100" value="0" class="slider" id="4d_fourth_g">
+    </td>
+    <td>
+      <input type="range" min="-100" max="100" value="0" class="slider" id="4d_fourth_h">
+    </td>
+    <td>
+      <input type="range" min="0" max="200" value="100" class="slider" id="4d_fourth_i">
+    </td>
+  </tr>
+
+</tbody>
+</table><input class="aligncenter" onclick="(function resetMatrix_4d_fourth()
+{
+  document.getElementById('4d_fourth_a').value=100;
+  document.getElementById('4d_fourth_b').value=0;
+  document.getElementById('4d_fourth_c').value=0;
+
+  document.getElementById('4d_fourth_d').value=0;
+  document.getElementById('4d_fourth_e').value=100;
+  document.getElementById('4d_fourth_f').value=0;
+
+  document.getElementById('4d_fourth_g').value=0;
+  document.getElementById('4d_fourth_h').value=0;
+  document.getElementById('4d_fourth_i').value=100;
+})()" type="reset" value="Reset">
+
+
+
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+var myCanvasRenderer = new window.ThreeRender('4d_fourth');
+
+myCanvasRenderer.createPlaneStencilGroup = function (geometry, plane, renderOrder)
+{
+  const group = new THREE.Group();
+  const baseMat = new THREE.MeshBasicMaterial();
+  baseMat.depthWrite = false;
+  baseMat.depthTest = false;
+  baseMat.colorWrite = false;
+  baseMat.stencilWrite = true;
+  baseMat.stencilFunc = THREE.AlwaysStencilFunc;
+
+  // back faces
+  const mat0 = baseMat.clone();
+  mat0.side = THREE.BackSide;
+  mat0.clippingPlanes = [ plane ];
+  mat0.stencilFail = THREE.IncrementWrapStencilOp;
+  mat0.stencilZFail = THREE.IncrementWrapStencilOp;
+  mat0.stencilZPass = THREE.IncrementWrapStencilOp;
+
+  const mesh0 = new THREE.Mesh( geometry, mat0 );
+  mesh0.renderOrder = renderOrder;
+  group.add(mesh0);
+
+  // front faces
+  const mat1 = baseMat.clone();
+  mat1.side = THREE.FrontSide;
+  mat1.clippingPlanes = [plane];
+  mat1.stencilFail = THREE.DecrementWrapStencilOp;
+  mat1.stencilZFail = THREE.DecrementWrapStencilOp;
+  mat1.stencilZPass = THREE.DecrementWrapStencilOp;
+
+  const mesh1 = new THREE.Mesh(geometry, mat1);
+  mesh1.renderOrder = renderOrder;
+
+  group.add(mesh1);
+
+  return group;
+}
+
+myCanvasRenderer.setup = function() {
+  
+  this.renderer.localClippingEnabled = true;
+
+  // Camera
+  this.camera = new THREE.PerspectiveCamera( 45, 1, 1, 1000 );
+  this.camera.position.set( 0, -0.001, 4 );
+  this.camera.up = new THREE.Vector3(0,0,1);
+  this.camera.lookAt(new THREE.Vector3(0,0,0));
+  const controls = new OrbitControls(this.camera, this.canvas);
+  controls.minDistance = 2;
+  controls.maxDistance = 20;
+  controls.enableZoom = false;
+  controls.update();
+
+  // Lights
+  this.scene.add(new THREE.AmbientLight(0xffffff, 0.5));
+  const dirLight = new THREE.DirectionalLight(0xffffff, 1);
+  dirLight.position.set( 5, 10, 7.5 );
+  this.scene.add( dirLight );
+
+  // Objects
+  this.planes = [new THREE.Plane( new THREE.Vector3(0, 0, -1), 1. )];
+  const geometry = new THREE.BoxGeometry(1, 1, 4);
+  this.object = new THREE.Group();
+  this.scene.add(this.object);
+
+
+  // Set up clip plane rendering
+  this.planeObjects = [];
+  const planeGeom = new THREE.PlaneGeometry( 4, 4 );
+
+  const poGroup = new THREE.Group();
+  const plane = this.planes[0];
+  const stencilGroup = this.createPlaneStencilGroup(geometry, plane, 1);
+
+  // plane is clipped by the other clipping planes
+  const planeMat =
+    new THREE.MeshStandardMaterial( {
+      color: 0xff6666,
+      metalness: 0.1,
+      roughness: 0.75,
+      stencilWrite: true,
+      stencilRef: 0,
+      stencilFunc: THREE.NotEqualStencilFunc,
+      stencilFail: THREE.ReplaceStencilOp,
+      stencilZFail: THREE.ReplaceStencilOp,
+      stencilZPass: THREE.ReplaceStencilOp,
+    } );
+  const po = new THREE.Mesh( planeGeom, planeMat );
+  po.onAfterRender = function ( renderer ) {
+    renderer.clearStencil();
+  };
+
+  po.renderOrder = 1.1;
+  this.object.add( stencilGroup );
+  poGroup.add( po );
+  this.planeObjects.push( po );
+  this.scene.add( poGroup );
+
+  const material = new THREE.MeshStandardMaterial({
+    color: 0x666666,
+    metalness: 0.1,
+    roughness: 0.75,
+    clippingPlanes: this.planes,
+    clipShadows: true,
+    shadowSide: THREE.DoubleSide,
+  });
+  const clippedColorFront = new THREE.Mesh( geometry, material );
+  clippedColorFront.renderOrder = 6;
+  this.object.add(clippedColorFront);
+  this.object.matrixAutoUpdate=false;
+
+  var grid = new THREE.Mesh(new THREE.BoxGeometry(3, 3, .01),
+                       new THREE.MeshBasicMaterial({depthTest:true, color: 0x666666, opacity: 0.3, transparent:true})
+                      );
+  this.scene.add(grid);
+
+  this.ghost = new THREE.Mesh(geometry,
+                       new THREE.MeshBasicMaterial({depthTest:true, color: 0x666666, opacity: 0.1, transparent:true})
+                      );
+  this.ghost.matrixAutoUpdate=false;
+  this.scene.add(this.ghost);
+};
+
+myCanvasRenderer.manipulate = function() {
+  var mat = new THREE.Matrix4().set(
+  document.getElementById("4d_fourth_a").value/100, document.getElementById("4d_fourth_b").value/100, document.getElementById("4d_fourth_c").value/100, 0,
+  document.getElementById("4d_fourth_d").value/100, document.getElementById("4d_fourth_e").value/100, document.getElementById("4d_fourth_f").value/100, 0,
+  document.getElementById("4d_fourth_g").value/100, document.getElementById("4d_fourth_h").value/100, document.getElementById("4d_fourth_i").value/100, 0,
+  0, 0, 0, 1
+         );
+  this.object.matrix = mat;
+  this.ghost.matrix = mat;
+
+  for ( let i = 0; i < this.planeObjects.length; i ++ ) {
+
+          const plane = this.planes[ i ];
+          const po = this.planeObjects[ i ];
+          plane.coplanarPoint( po.position );
+          po.lookAt(
+            po.position.x - plane.normal.x,
+            po.position.y - plane.normal.y,
+            po.position.z - plane.normal.z,
+          );
+
+        }
+}
+
+myCanvasRenderer.render();
+</script>
+
+
+
+<p>Time to make some observations:<br>• The top left $2 \times 2$ elements affects the square exactly like the $2 \times 2$ matrix we saw above. This is good, we are starting off of solid foundations!<br>• The bottom left element and the element to its right shear the cuboid along the $z$-axis and as such, generally do not have an effect on our square.<br>• The top right element and the element below it result in the shearing of cuboid along the $x-y$ plane, and in turn facilitates in translating our square about the plane of slice. This is <em>exactly</em> what we wanted!</p>
+
+
+
+<p>By promoting ourselves to a higher dimension, we have successfully found a way to translate our squarie all while retaining the sweet properties of matrices!<br></p>
+
+
+
+<p class="has-very-light-gray-background-color has-background">Just an aside: we do not really create the cuboid, you must have guessed that much; all we do is convert a 2D vector to 3D as:<br>$$\begin{bmatrix}<br>x\\<br>y<br>\end{bmatrix} \rightarrow<br>\begin{bmatrix}<br>x\\<br>y\\<br>1<br>\end{bmatrix}<br>$$</p>
+
+
+
+<h2><em>Epilogue</em></h2>
+
+
+
+<p>This concludes our journey that took us from a simple problem of wanting to move a 2D shape, to linear transformations and matrices, to tapping into higher dimensionality to solve this problem and eventually to finding a way to perform the standard transformations – <em>Rotate</em>, <em>Scale</em> and <em>Translate</em>, all using <em>only</em> matrices. This is exactly what is used in the three dimensional graphics too, only now, we would be tapping into the fourth dimension, and "slicing" it off to get a 3D representation that we are, oh so fond of! Finally for the sake of completeness, let's take a look at a typical transformation of a 3D point:<br>$$<br>\begin{eqnarray}<br>\begin{bmatrix}<br>x'\\<br>y'\\<br>z'\\<br>1\\<br>\end{bmatrix}<br>&amp;=&amp;<br>\begin{bmatrix}<br>s_x &amp; 0 &amp; 0 &amp; 0\\<br>0 &amp; s_y &amp; 0 &amp; 0\\<br>0 &amp; 0 &amp; s_z &amp; 0\\<br>0 &amp; 0 &amp; 0 &amp; 1\\<br>\end{bmatrix}\\<br>&amp; \cdot &amp;<br>\begin{bmatrix}<br>\cos \theta &amp; -\sin \theta &amp; 0 &amp; 0\\<br>\sin \theta &amp; \cos \theta &amp; 0 &amp; 0\\<br>0 &amp; 0 &amp; 1 &amp; 0\\<br>0 &amp; 0 &amp; 0 &amp; 1\\<br>\end{bmatrix}\\<br>&amp; \cdot &amp;<br>\begin{bmatrix}<br>1 &amp; 0 &amp; 0 &amp; t_x\\<br>0 &amp; 1 &amp; 0 &amp; t_y\\<br>0 &amp; 0 &amp; 1 &amp; t_z\\<br>0 &amp; 0 &amp; 0 &amp; 1\\<br>\end{bmatrix}\\<br>&amp; \cdot &amp;<br>\begin{bmatrix}<br>x\\<br>y\\<br>z\\<br>1\\<br>\end{bmatrix}\\<br>\end{eqnarray}$$<br></p>

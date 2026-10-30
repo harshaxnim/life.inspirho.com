@@ -1,0 +1,20 @@
+{%- comment -%} template-parts/biography.php: shown only for an author with a bio. {%- endcomment -%}
+{%- assign au = site.data.authors[page.wp_author] | default: site.data.authors.admin -%}
+{%- if au.bio %}
+<div class="author-info">
+	<div class="author-avatar">
+		<img alt="" src="{{ au.bio_avatar | relative_url }}" srcset="{{ au.bio_avatar2x | relative_url }} 2x" class="avatar avatar-42 photo" height="42" width="42" loading="lazy" decoding="async">
+	</div><!-- .author-avatar -->
+
+	<div class="author-description">
+		<h2 class="author-title"><span class="author-heading">Author:</span> {{ au.name }}</h2>
+
+		<p class="author-bio">
+			{{ au.bio }}
+			<a class="author-link" href="{{ '/all/' | relative_url }}" rel="author">
+				View all posts by {{ au.name }}
+			</a>
+		</p><!-- .author-bio -->
+	</div><!-- .author-description -->
+</div><!-- .author-info -->
+{%- endif %}

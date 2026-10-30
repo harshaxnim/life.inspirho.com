@@ -1,0 +1,429 @@
+---
+layout: post
+status: publish
+published: true
+title: With just one polka dot, nothing can be achieved
+excerpt: Exploring the dance of dots.
+wordpress_id: 708
+date: 2022-12-05 10:01:09 +0000
+categories:
+- cg
+tags: []
+permalink: /cg/with-just-one-polka-dot-nothing-can-be-achieved/
+subtitle: <p>Exploring the dance of dots.</p>
+---
+<p class="has-medium-font-size">[<em>This is a work in progress, some interactives might not work</em>]</p>
+
+
+
+
+<script type="importmap">
+  {
+    "imports": {
+      "three": "{{ site.baseurl }}/assets/vendor/three/three.module.js",
+      "three/addons/": "{{ site.baseurl }}/assets/vendor/three/addons/"
+    }
+  }
+</script>
+
+<script type="module">
+  import * as THREE from "three";
+
+  if(typeof ThreeRender !== "function")
+  {
+    window.ThreeRender = class {
+      constructor(elementId) {
+        this.canvas = document.getElementById(elementId);
+        this.canvas.style.height = this.canvas.style.width;
+        this.canvas.width  = this.canvas.offsetWidth;
+        this.canvas.height = this.canvas.offsetWidth;
+      }
+
+      animate() {
+          requestAnimationFrame(()=>this.animate());
+          this.manipulate();
+          this.renderer.render(this.scene, this.camera);
+      }
+
+      manipulate() {
+        this.mesh.rotation.x += 0.0002;
+        this.mesh.rotation.y += 0.0002;
+        this.mesh.rotation.z += 0.0002;
+      }
+
+      setup() {
+        this.camera = new THREE.OrthographicCamera( -400, 400, 400, -400, 1, 1000 );
+        this.camera.position.z = 400;
+        this.camera.lookAt(new THREE.Vector3(0,0,0));
+        this.scene.add(this.camera);
+
+        var geometry = new THREE.SphereGeometry(300);
+        var material = new THREE.LineBasicMaterial( {color: 0x666666} );
+
+        this.mesh = new THREE.LineSegments( geometry, material );
+        this.scene.add( this.mesh );
+      }
+
+      render() {
+        this.scene = new THREE.Scene();
+        this.renderer = new THREE.WebGLRenderer( { canvas: this.canvas, antialias: true, alpha: true, stencil: true} );
+        this.renderer.setClearColor( 0x000000, 0 );
+        this.setup();
+        this.animate();
+      }
+
+    };
+  }
+</script>
+
+
+
+
+<figure class="wp-block-image size-full"><img decoding="async" loading="lazy" width="500" height="432" src="{{ site.baseurl }}/wp-content/uploads/2022/12/butterfly-1988.jpgBlog.jpg" alt="" class="wp-image-709" srcset="{{ site.baseurl }}/wp-content/uploads/2022/12/butterfly-1988.jpgBlog.jpg 500w, {{ site.baseurl }}/wp-content/uploads/2022/12/butterfly-1988.jpgBlog-300x259.jpg 300w" sizes="(max-width: 500px) 85vw, 500px" /><figcaption class="wp-element-caption">Butterfly, <a href="https://www.wikiart.org/en/yayoi-kusama"><em>Yayoi Kusama</em></a>&nbsp;1988<br></figcaption></figure>
+
+
+
+<h2><em>Prologue</em></h2>
+
+
+
+<p>It is a widely known scientific fact that a <a rel="noreferrer noopener" href="https://en.wikipedia.org/wiki/Spherical_cow" target="_blank">cow is a sphere</a>. Further, one might trivially observe that, a sphere is a point. Hence, points are the infimum of world models, earning their canonical reverence by representing any object and describing any phenomenon. So, we have much incentive in studying points and the arrangements of points.</p>
+
+
+
+<h2><em>Part 0<br></em>The Point</h2>
+
+
+<div class="wp-block-image">
+<figure class="aligncenter size-full"><img decoding="async" loading="lazy" width="556" height="142" src="{{ site.baseurl }}/wp-content/uploads/2022/12/TesseractExplanation.gif" alt="Evolution of a point" class="wp-image-831"/></figure></div>
+
+
+<p></p>
+
+
+
+<p>The point is the only geometry in the lowest dimension. The complication of dimensions allows us to make lines, squares, cubes, tesseracts, and so on. But since each of those objects can be discretized into the simpler forms – cubes made of squares, square of lines, and ultimately lines made of points, we can see that points truly can be thought of as building blocks of everything.</p>
+
+
+
+<p>Kusama was right on money when she said <em>&#8220;With just one polka dot, nothing can be achieved&#8221;</em>. Points are interesting when they play with each other. In this post, I want to explore how points come together to create a complex myriad of patterns and phenomenon that we see in the world.</p>
+
+
+
+<h2><em>Part I<br></em>Entropy</h2>
+
+
+
+<p>Let&#8217;s begin where the worlds end – the state of highest entropy or pure randomness! What does it look like to randomly sample points from a <a rel="noreferrer noopener" href="https://en.wikipedia.org/wiki/Continuous_uniform_distribution" target="_blank">Uniform Distribution Function</a> for our dots?</p>
+
+
+
+<canvas id="dots_rand" style="background: transparent; width: 100%; height: 1px; display: block;"></canvas><br>
+<table class="l1 wp-block-table aligncenter" style="border: none;">
+<tbody>
+<tr>
+<td><input type="range" min="0" max="50" value="25" class="slider" id="rand_slider"></td>
+<td>Number of Points</td>
+</tr>
+</tbody>
+</table>
+<input class="aligncenter" onclick="(function() {
+  document.getElementById('rand_slider').value = document.getElementById('rand_slider').defaultValue;
+  window.randReset = true;
+})()" type="reset" value="Reset">
+
+
+
+<script type="module">
+import * as THREE from 'three';
+var myCanvasRenderer = new ThreeRender('dots_rand');
+
+myCanvasRenderer.setup = function() {
+
+  this.camera = new THREE.PerspectiveCamera(60, 1, 1, 1000);
+  this.camera.position.z = 200;
+  this.camera.up = new THREE.Vector3(0,0,1);
+  this.camera.lookAt(new THREE.Vector3(0,0,0));
+  this.scene.add(this.camera);
+  
+
+  const bgSize = 200;
+  this.grid = new THREE.Mesh(new THREE.BoxGeometry(bgSize, bgSize, .1),
+                             new THREE.MeshBasicMaterial({depthTest:false, color: 0xD83A33}));
+  this.grid.matrixAutoUpdate=false;
+  this.scene.add(this.grid);
+
+
+  var dotGeometry = new THREE.BufferGeometry();
+  this.pointSize = 32;
+  this.wid = (bgSize-(bgSize/10)) - (this.pointSize/2);
+  this.prevRandSlider = document.getElementById("rand_slider").value;
+  const vertices = [];
+  for (let i = 0; i < document.getElementById("rand_slider").max; i ++)
+  {
+    const x = this.wid * Math.random() - (this.wid/2);
+    const y = this.wid * Math.random() - (this.wid/2);
+    vertices.push(x, y, 0.);
+  }
+  const sprite = new THREE.TextureLoader().load('{{ site.baseurl }}/wp-content/uploads/2022/12/shadow.png');
+  dotGeometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+  var dotMaterial = new THREE.PointsMaterial({ size: this.pointSize, map: sprite, alphaTest: 0.5, transparent: true });
+  this.dot = new THREE.Points(dotGeometry, dotMaterial);
+  this.dot.geometry.setDrawRange(0, this.prevRandSlider);
+  this.scene.add(this.dot);
+
+};
+
+myCanvasRenderer.manipulate = function() {
+  if(document.getElementById("rand_slider").value != this.prevRandSlider)
+  {
+    this.prevRandSlider = document.getElementById("rand_slider").value;
+
+    if(window.randReset)
+    {
+      window.randReset = false;
+
+      const vertices = this.dot.geometry.attributes.position.array;
+      for (let i = 0; i < this.prevRandSlider; i ++)
+      {
+        vertices[i*3 + 0] = this.wid * Math.random() - (this.wid/2);
+        vertices[i*3 + 1] = this.wid * Math.random() - (this.wid/2);
+      }
+      
+    }
+
+    this.dot.geometry.setDrawRange(0, this.prevRandSlider);
+    this.dot.geometry.attributes.position.needsUpdate = true;
+  }
+}
+
+function reset_rand() {
+  document.getElementById("rand_slider").value = document.getElementById("rand_slider").defaultValue;
+  window.randReset = true;
+}
+
+myCanvasRenderer.render();
+
+</script>
+
+
+
+<p>One might think <em>"What's in a randomly scattered set of points?"</em> – Quite a bit actually! For instance, Monte Carlo method to Calculate π</p>
+
+
+
+<p>[Todo Demo] Finding ~pi.</p>
+
+
+
+<h2><em>Part II<br></em>Patterns</h2>
+
+
+
+<canvas id="dots_uniform" style="background: transparent; width: 100%; height: 1px; display: block;"></canvas><br>
+<table class="l1 wp-block-table aligncenter" style="border: none;">
+<tbody>
+<tr>
+<td><input type="range" min="0" max="1" value="0" class="slider" id="pattern_slider"></td>
+</tr>
+</tbody>
+</table>
+
+
+
+<script type="module">
+import * as THREE from 'three';
+var myCanvasRenderer = new ThreeRender('dots_uniform');
+
+myCanvasRenderer.setup = function() {
+
+  this.camera = new THREE.PerspectiveCamera(60, 1, 1, 1000);
+  this.camera.position.z = 200;
+  this.camera.up = new THREE.Vector3(0,0,1);
+  this.camera.lookAt(new THREE.Vector3(0,0,0));
+  this.scene.add(this.camera);
+  
+
+  const bgSize = 200;
+  this.grid = new THREE.Mesh(new THREE.BoxGeometry(bgSize, bgSize, .1),
+                             new THREE.MeshBasicMaterial({depthTest:false, color: 0xD83A33}));
+  this.grid.matrixAutoUpdate=false;
+  this.scene.add(this.grid);
+
+
+  var dotGeometry = new THREE.BufferGeometry();
+  this.pointSize = 32;
+  this.gap = 26.5;
+  this.wid = (bgSize-(bgSize/10)) - (this.pointSize/2);
+  this.prevSlider = 0;
+  var vertices = [];
+  for (let i = 0; i < 7; i ++)
+  {
+    for (let j = 0; j < 7; j ++)
+    {
+      const x = (i-3) * this.gap;
+      const y = (j-3) * this.gap;
+      vertices.push(x, y, 0.);
+    }
+  }
+  const sprite = new THREE.TextureLoader().load('{{ site.baseurl }}/wp-content/uploads/2022/12/shadow.png');
+  dotGeometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+  var dotMaterial = new THREE.PointsMaterial({ size: this.pointSize, map: sprite, alphaTest: 0.5, transparent: true });
+  this.dot = new THREE.Points(dotGeometry, dotMaterial);
+  this.scene.add(this.dot);
+
+};
+
+myCanvasRenderer.manipulate = function() {
+  if(document.getElementById("pattern_slider").value != this.prevSlider)
+  {
+    this.prevSlider = document.getElementById("pattern_slider").value;
+
+    var vertices = this.dot.geometry.attributes.position.array;
+    var index = 0
+    for (let i = 0; i < 7; i ++)
+    {
+      const num = this.prevSlider==1 ? ((i%2) ? 6 : 7) : 7;
+      for (let j = 0; j < num; j ++)
+      {
+        vertices[index++] = (i-3) * this.gap;
+        vertices[index++] = ((j-3) * this.gap) + (this.prevSlider==1 ? ((i%2)*this.gap/2) : 0);
+        vertices[index++] = 0.;
+      }
+    }
+
+    this.dot.geometry.setDrawRange(0, this.prevSlider==1 ? 46 : 49);
+    this.dot.geometry.attributes.position.needsUpdate = true;
+  }
+}
+
+myCanvasRenderer.render();
+
+</script>
+
+
+
+<p>Wes Anderson-esque patterns such as these are pleasing to look at. But they are not always useful, especially when we are modelling something more natural like trees on the forest floor, placing fur on characters etc.</p>
+
+
+
+<p>Let's now try to hit a soft spot between the extremes of disorderliness and orderliness. One such way is Poisson Disk Sampling that I will demonstrate below.</p>
+
+
+
+<h2><em>Part III<br></em>Structured Noise</h2>
+
+
+
+<p>One of the simplest structed random distributions is <em>Jittered Grid</em>. In this method, we divide our space into $n\times n$ grid and choose a random point in each grid block. </p>
+
+
+
+<canvas id="dots_jittered_grid" style="background: transparent; width: 100%; height: 1px; display: block;"></canvas><br>
+<table class="l1 wp-block-table aligncenter" style="border: none;">
+<tbody style=>
+<tr>
+<td><input type="range" min="0" max="10" value="5" class="slider" id="jgs_slider" style="text-align: center"></td>
+<td>Grid Size</td>
+</tr>
+<tr>
+<td><input type="range" min="0" max="1" step="0.01" value="0.5" class="slider" id="jgj_slider" style="text-align: center"></div></td>
+<td>Jitter Strength</td>
+</tr>
+</tbody>
+</table>
+
+
+
+<script type="module">
+import * as THREE from 'three';
+var myCanvasRenderer = new ThreeRender('dots_jittered_grid');
+
+myCanvasRenderer.setup = function() {
+
+  this.camera = new THREE.PerspectiveCamera(60, 1, 1, 1000);
+  this.camera.position.z = 200;
+  this.camera.up = new THREE.Vector3(0,0,1);
+  this.camera.lookAt(new THREE.Vector3(0,0,0));
+  this.scene.add(this.camera);
+  this.slider = document.getElementById("jgs_slider");
+  this.jitter = document.getElementById("jgj_slider");
+  
+
+  const bgSize = 200;
+  this.grid = new THREE.Mesh(new THREE.BoxGeometry(bgSize, bgSize, .1),
+                             new THREE.MeshBasicMaterial({depthTest:false, color: 0xD83A33}));
+  this.grid.matrixAutoUpdate=false;
+  this.scene.add(this.grid);
+
+  var dotGeometry = new THREE.BufferGeometry();
+  this.pointSize = 200/this.slider.value;
+  this.wid = bgSize;
+  this.gap = this.wid/this.slider.value;
+  this.prevSlider = 0;
+  this.prevJitter = 0;
+  var vertices = [];
+  const maxSize = 40;
+  for (let i = 0; i < maxSize; i ++)
+  {
+    for (let j = 0; j < maxSize; j ++)
+    {
+      const x = (i-(this.slider.value*1.-1.)/2) * this.gap;
+      const y = (j-(this.slider.value*1.-1.)/2) * this.gap;
+      vertices.push(x, y, 0.);
+    }
+  }
+  const sprite = new THREE.TextureLoader().load('{{ site.baseurl }}/wp-content/uploads/2022/12/shadow.png');
+  dotGeometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+  var dotMaterial = new THREE.PointsMaterial({ size: this.pointSize, map: sprite, alphaTest: 0.5, transparent: true });
+  this.dot = new THREE.Points(dotGeometry, dotMaterial);
+  this.scene.add(this.dot);
+
+};
+
+myCanvasRenderer.manipulate = function() {
+  if (this.slider.value != this.prevSlider || this.jitter.value != this.prevJitter)
+  {
+    this.prevSlider = this.slider.value;
+    this.prevJitter = this.jitter.value;
+
+    const newPointSize = 200/this.slider.value;
+
+    this.gap = this.wid/this.slider.value;
+
+    const jitterScaled = this.jitter.value*this.gap;
+
+    var vertices = this.dot.geometry.attributes.position.array;
+    var index = 0
+    for (let i = 0; i < this.slider.value; i++)
+    {
+      for (let j = 0; j < this.slider.value; j++)
+      {
+        vertices[index++] = (i-(this.slider.value*1.-1.)/2) * this.gap + jitterScaled * Math.random() - jitterScaled/2;
+        vertices[index++] = (j-(this.slider.value*1.-1.)/2) * this.gap + jitterScaled * Math.random() - jitterScaled/2;
+        vertices[index++] = 0.;
+      }
+    }
+
+    this.dot.geometry.setDrawRange(0, this.prevSlider*this.prevSlider);
+    this.dot.geometry.attributes.position.needsUpdate = true;
+    this.dot.material.size = newPointSize;
+    this.dot.material.needsUpdate = true;
+  }
+}
+
+myCanvasRenderer.render();
+
+</script>
+
+
+
+<p>While this method is a step towards less regularity, we still see grid layout in low jitter values. On the other had, for higher jitter values, there are significant number of point too close to each other. There is no way to guarantee a good spaced out distribution with this approach. Fret not, because we have other tricks up our sleeve to fix these issues and get a better result.</p>
+
+
+
+<p>Let's now look at Blue Noise, an even, isotropic, yet unstructured distribution of points using <em>Poisson Disk Sampling</em>. We will later see how minor variations of this allows us to make the night sky, or even make our own dithering engine.</p>
+
+
+
+<p>But for now, here's a $O(n)$ implementation of the paper <a href="https://www.cs.ubc.ca/~rbridson/docs/bridson-siggraph07-poissondisk.pdf">Fast Poisson Disk Sampling in Arbitrary Dimensions</a> by Prof. Robert Bridson of <em>University of British Columbia</em>.</p>

@@ -1,0 +1,65 @@
+---
+layout: default
+---
+<article id="post-{{ page.wordpress_id }}" class="post-{{ page.wordpress_id }} post type-post status-publish format-standard hentry{% for c in page.categories %} category-{{ c | slugify }}{% endfor %}">
+	<header class="entry-header">
+		<h1 class="entry-title">{{ page.title_html | default: page.title }}</h1>
+	</header><!-- .entry-header -->
+	{%- if page.subtitle %}
+
+				<div class="entry-summary">
+				{{ page.subtitle }}
+			</div><!-- .entry-summary -->
+	{%- endif %}
+
+	<div class="entry-content">
+		{{ content }}
+		{% include author-bio.html %}
+	</div><!-- .entry-content -->
+
+	<footer class="entry-footer">
+		{% include entry-meta.html post=page %}
+	</footer><!-- .entry-footer -->
+</article><!-- #post-## -->
+
+{%- if page.comments.size > 0 %}
+
+<div id="comments" class="comments-area">
+	<h2 class="comments-title">
+		{{ page.comments.size }} thought{% if page.comments.size > 1 %}s{% endif %} on &ldquo;{{ page.title_html | default: page.title }}&rdquo;
+	</h2>
+
+	<ol class="comment-list">
+	{%- for c in page.comments %}
+		<li id="comment-{{ forloop.index }}" class="comment depth-1">
+			<article id="div-comment-{{ forloop.index }}" class="comment-body">
+				<footer class="comment-meta">
+					<div class="comment-author vcard">
+						<img alt="" src="{{ c.avatar | default: '/assets/images/author-49.jpg' | relative_url }}"{% if c.avatar2x %} srcset="{{ c.avatar2x | relative_url }} 2x"{% endif %} class="avatar avatar-42 photo" height="42" width="42" loading="lazy" decoding="async">
+						<b class="fn">{% if c.author_url %}<a href="{{ c.author_url }}" rel="external nofollow ugc" class="url">{{ c.author }}</a>{% else %}{{ c.author }}{% endif %}</b> <span class="says">says:</span>
+					</div><!-- .comment-author -->
+
+					<div class="comment-metadata">
+						<a href="#comment-{{ forloop.index }}"><time datetime="{{ c.date | date_to_xmlschema }}">{{ c.date | date: "%B %-d, %Y at %-l:%M %P" }}</time></a>
+					</div><!-- .comment-metadata -->
+				</footer><!-- .comment-meta -->
+
+				<div class="comment-content">
+					{{ c.content }}
+				</div><!-- .comment-content -->
+			</article><!-- .comment-body -->
+		</li><!-- #comment-## -->
+	{%- endfor %}
+	</ol><!-- .comment-list -->
+
+	<p class="no-comments">Comments are closed.</p>
+</div><!-- .comments-area -->
+{%- endif %}
+
+	<nav class="navigation post-navigation" aria-label="Posts">
+		<h2 class="screen-reader-text">Post navigation</h2>
+		<div class="nav-links">
+		{%- if page.previous %}<div class="nav-previous"><a href="{{ page.previous.url | relative_url }}" rel="prev"><span class="meta-nav" aria-hidden="true">Previous</span> <span class="screen-reader-text">Previous post:</span> <span class="post-title">{{ page.previous.title_html | default: page.previous.title }}</span></a></div>{% endif %}
+		{%- if page.next %}<div class="nav-next"><a href="{{ page.next.url | relative_url }}" rel="next"><span class="meta-nav" aria-hidden="true">Next</span> <span class="screen-reader-text">Next post:</span> <span class="post-title">{{ page.next.title_html | default: page.next.title }}</span></a></div>{% endif %}
+		</div>
+	</nav>

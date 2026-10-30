@@ -1,0 +1,38 @@
+{%- comment -%}
+  paginate_links() as Twenty Sixteen printed it. include.cur / include.last are page numbers;
+  include.base is page 1's path ("/" or "/category/cg/"); page N lives at base + "page/N/".
+{%- endcomment -%}
+{%- assign cur = include.cur -%}
+{%- assign last = include.last -%}
+{%- if last > 1 %}
+	<nav class="navigation pagination" aria-label="Posts">
+		<h2 class="screen-reader-text">Posts navigation</h2>
+		<div class="nav-links">
+		{%- if cur > 1 -%}
+			{%- assign prev = cur | minus: 1 -%}
+			{%- if prev == 1 %}{% assign href = include.base %}{% else %}{% capture href %}{{ include.base }}page/{{ prev }}/{% endcapture %}{% endif %}
+<a class="prev page-numbers" href="{{ href | relative_url }}">Previous page</a>
+		{%- endif -%}
+		{%- assign dots = false -%}
+		{%- for n in (1..last) -%}
+			{%- assign d = n | minus: cur -%}
+			{%- if n == 1 or n == last or d >= -1 and d <= 1 -%}
+				{%- assign dots = false -%}
+				{%- if n == 1 %}{% assign href = include.base %}{% else %}{% capture href %}{{ include.base }}page/{{ n }}/{% endcapture %}{% endif -%}
+				{%- if n == cur %}
+<span aria-current="page" class="page-numbers current"><span class="meta-nav screen-reader-text">Page </span>{{ n }}</span>
+				{%- else %}
+<a class="page-numbers" href="{{ href | relative_url }}"><span class="meta-nav screen-reader-text">Page </span>{{ n }}</a>
+				{%- endif -%}
+			{%- elsif dots == false -%}
+				{%- assign dots = true %}
+<span class="page-numbers dots">&hellip;</span>
+			{%- endif -%}
+		{%- endfor %}
+		{%- if cur < last -%}
+			{%- capture href %}{{ include.base }}page/{{ cur | plus: 1 }}/{% endcapture %}
+<a class="next page-numbers" href="{{ href | relative_url }}">Next page</a>
+		{%- endif %}
+		</div>
+	</nav>
+{%- endif %}

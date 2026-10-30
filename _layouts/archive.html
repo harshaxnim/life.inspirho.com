@@ -1,0 +1,25 @@
+---
+layout: default
+---
+{%- comment -%} archive.php: one category, 5 posts per page like the home page. {%- endcomment -%}
+{%- assign per = site.paginate -%}
+{%- assign cat_posts = site.categories[page.category] -%}
+{%- assign cur = page.page_num | default: 1 -%}
+{%- assign offset = cur | minus: 1 | times: per -%}
+{%- assign last = cat_posts.size | plus: per | minus: 1 | divided_by: per -%}
+<header class="page-header">
+	<h1 class="page-title">Category: <span>{{ page.category }}</span></h1>
+</header><!-- .page-header -->
+
+{% for post in cat_posts offset: offset limit: per %}
+{% include content.html post=post %}
+{% endfor %}
+
+{%- if cur > last %}
+<section class="no-results not-found">
+	<div class="page-content"><p>There are no more posts in this category. Every post is listed on the <a href="{{ '/all/' | relative_url }}">All</a> page.</p></div>
+</section>
+{%- endif %}
+
+{% capture base %}/category/{{ page.category | slugify }}/{% endcapture %}
+{% include pagination.html cur=cur last=last base=base %}

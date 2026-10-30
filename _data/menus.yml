@@ -1,0 +1,21 @@
+# Primary menu (header and footer). Items may have `children:` for a dropdown.
+primary:
+  - title: cg
+    url: /category/cg/
+  - title: diy
+    url: /category/diy/
+  - title: lè me
+    url: /me/
+  - title: All
+    url: /all/
+
+# Social links menu; Twenty Sixteen picks the icon from the URL.
+social:
+  - title: le me
+    url: /about/
+  - title: facebook
+    url: https://www.facebook.com/harshaxnim
+  - title: twitter
+    url: https://twitter.com/harshaxnim
+  - title: youtube
+    url: https://www.youtube.com/user/tharshavardhanreddy
