@@ -80,15 +80,6 @@
 	.post-list .post-date { display: inline; float: right; margin-left: 1em; line-height: 2.2; }
 }
 
-/* Footer: "/" between the hosting credit and the Analytics link, like the one after the site title. */
-.site-info .stats-link:before {
-	content: "\002f";
-	display: inline-block;
-	font-family: Montserrat, sans-serif;
-	opacity: 0.7;
-	padding: 0 0.538461538em 0 0.230769231em;
-}
-
 /* Analytics page (/analytics/): ink-only, set like the "All" page's year headings and lists. */
 .stats-status { color: #686868; font-style: italic; }
 
@@ -169,6 +160,61 @@
 
 .stats-axis #s-readout { color: #1a1a1a; font-weight: 700; text-align: center; }
 
+.entry-content .stats-h--section { margin-top: 3.5em; }
+
+/* World map (_includes/world-map.svg, from lerpit.com) beside the top countries. */
+.stats-places {
+	align-items: center;
+	display: grid;
+	gap: 1.75em;
+	grid-template-columns: minmax(0, 1fr);
+}
+
+.stats-map {
+	margin: 0;
+	position: relative;
+	touch-action: pan-y;
+}
+
+.stats-map svg {
+	display: block;
+	height: auto;
+	width: 100%;
+}
+
+.stats-map path {
+	fill: #f1f1f1;
+	stroke: #d1d1d1;
+	stroke-linejoin: round;
+	stroke-width: 0.5;
+}
+
+.stats-map path.is-read {
+	fill: #1a1a1a;
+	fill-opacity: var(--shade);
+}
+
+.stats-map path:hover {
+	stroke: #1a1a1a;
+	stroke-width: 1;
+}
+
+.stats-tip {
+	background: #fff;
+	border: 1px solid #d1d1d1;
+	color: #1a1a1a;
+	font-family: Montserrat, "Helvetica Neue", sans-serif;
+	font-size: 0.75rem;
+	line-height: 1.5;
+	margin: 0;
+	padding: 0.3em 0.6em;
+	pointer-events: none;
+	position: absolute;
+	transform: translate(-50%, calc(-100% - 10px));
+	white-space: nowrap;
+	z-index: 1;
+}
+
 .stat-lists {
 	display: grid;
 	gap: 2.625em 3.5em;
@@ -222,5 +268,10 @@
 @media screen and (min-width: 44.375em) {
 	.stat-tiles { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 	.stat-tiles dd { font-size: 1.75rem; }
-	.stat-lists { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+	.stats-places { grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); }
+}
+
+/* Desktop breakpoint: the three lists side by side. */
+@media screen and (min-width: 61.5625em) {
+	.stat-lists { gap: 2.625em 2.1875em; grid-template-columns: repeat(3, minmax(0, 1fr)); }
 }

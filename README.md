@@ -19,7 +19,7 @@ Static (Jekyll) version of the *ins · Π · rho* WordPress blog, built for GitH
 | `assets/external/` | Images that old posts hot-linked from Blogger, now local. |
 | `assets/vendor/three/` | three.js **r186 (0.186.1)**, self-hosted and pinned. |
 | `ray/` | The JS ray tracer that used to run on `ray.inspirho.in`. The ray-tracer post and the portfolio now use this copy; it scales down to fit a phone screen. |
-| `analytics.html`, `stats-worker/` | The public traffic page at `/analytics/` (footer link *Analytics*) and the Cloudflare Worker that feeds it. See [Analytics](#analytics). |
+| `analytics.html`, `stats-worker/` | The public traffic page at `/analytics/` (not linked from the site) and the Cloudflare Worker that feeds it. See [Analytics](#analytics). |
 
 The home page shows the 5 newest posts in full, with numbered pages at `/page/2/` … (`jekyll-paginate`, as on WordPress).
 Old WordPress URLs that have no page here (`/author/admin/`, `/author/harsh/`, `/tag/cg/`, `/categories/`, `/feed/`) redirect to the *All* page or the feed.
@@ -79,17 +79,19 @@ browser. Its beacon is in `_layouts/default.html`, before `</body>`, so every pa
 `ray/` has no beacon of its own: it only runs inside an iframe on pages that already count the visit.
 
 The numbers are public at **[inspirho.com/analytics/](https://inspirho.com/analytics/)**: visits in the last 24 hours,
-7 days and 30 days, page views over 30 days, a 30-day daily chart, and the top referrers, countries, devices and
-browsers.
+7 days and 30 days, page views over 30 days, a 30-day daily chart, a world map shaded by visits per country, and the
+top referrers, countries, devices and browsers.
 
 | Part | Where |
 | --- | --- |
 | Web Analytics site | Cloudflare dashboard → *Analytics & Logs → Web Analytics* → `inspirho.com`. The site tag (`dc3bd1c624cc45549062c8960955dd81`) identifies it in the GraphQL API; the token in the beacon (`8e0590552fff403ab6b59e613913730e`) is public by design. |
 | Stats Worker | `stats-worker/worker.js`, deployed as the Worker **`inspirho-stats`** on the custom domain **`stats.inspirho.com`** (it creates its own DNS record). It queries the Web Analytics GraphQL API with an API token kept as a Worker secret, caches the answer at the edge for 10 minutes and returns public JSON with `Access-Control-Allow-Origin: *`. `stats-worker/wrangler.toml` mirrors its configuration. |
 | Page | `analytics.html` (served at `/analytics/`), drawn by `assets/js/analytics.js`, styled at the end of `assets/css/site.css`. |
+| World map | `_includes/world-map.svg`, inlined into the page: Natural Earth countries in the Equal Earth projection, each path tagged with its ISO code (`data-c`), which is how Cloudflare names countries. Copied from lerpit.com; `scripts/world-map.mjs` regenerates it (see the comment at its top). |
 
 The Worker uses a custom domain rather than `workers.dev` because its edge cache (`caches.default`) only works on a
-custom domain. `stats-worker/` is listed under `exclude:` in `_config.yml`, so it is not published with the site.
+custom domain. `stats-worker/` and `scripts/` are listed under `exclude:` in `_config.yml`, so they are not published
+with the site.
 
 What it can't tell you: readers whose content blockers stop the beacon aren't counted, and Web Analytics doesn't
 measure time on page, so the page shows neither. New visits take a few minutes to reach the API, and the Worker's

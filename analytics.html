@@ -2,6 +2,7 @@
 layout: page
 title: Analytics
 permalink: /analytics/
+sitemap: false   # not linked from the site
 description: Live, public traffic numbers for inspirho.com. Visits, referrers, countries and devices, refreshed every ten minutes.
 ---
 {%- comment -%} Public traffic numbers, served as JSON by the stats Worker (stats-worker/) and drawn by assets/js/analytics.js. {%- endcomment -%}
@@ -20,9 +21,17 @@ description: Live, public traffic numbers for inspirho.com. Visits, referrers, c
 <div class="stats-bars" id="s-daily" role="group" aria-label="Visits per day, last 30 days"></div>
 <div class="stats-axis"><span id="s-first"></span><span id="s-readout" aria-live="polite"></span><span id="s-last"></span></div>
 
+<h2 class="stats-h stats-h--section">Where readers are</h2>
+<div class="stats-places">
+	<figure class="stats-map" id="s-map">
+		{% include world-map.svg %}
+		<p class="stats-tip" id="s-map-tip" hidden></p>
+	</figure>
+	<ol class="stat-list" id="l-countries"></ol>
+</div>
+
 <div class="stat-lists">
 	<section><h3 class="stats-h">Where they come from</h3><ol class="stat-list" id="l-refs"></ol></section>
-	<section><h3 class="stats-h">Countries</h3><ol class="stat-list" id="l-countries"></ol></section>
 	<section><h3 class="stats-h">Devices</h3><ol class="stat-list" id="l-devices"></ol></section>
 	<section><h3 class="stats-h">Browsers</h3><ol class="stat-list" id="l-browsers"></ol></section>
 </div>

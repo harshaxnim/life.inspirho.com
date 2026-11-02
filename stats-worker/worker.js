@@ -10,7 +10,7 @@ const DAYS = 30;
 const WINDOW = 7;
 const LISTS = {
   refs: ["refererHost", "Direct / unknown", 10],
-  countries: ["countryName", "Unknown", 10],
+  countries: ["countryName", "Unknown", 60], // enough to shade the map on /analytics/
   devices: ["deviceType", "Unknown", 5],
   browsers: ["userAgentBrowser", "Unknown", 6],
 };
@@ -93,7 +93,7 @@ export default {
     if (req.method !== "GET" || url.pathname !== "/") {
       return new Response('{"error":"not found"}', { status: 404, headers });
     }
-    const key = new Request(`${url.origin}/v2`); // bump when the response shape changes
+    const key = new Request(`${url.origin}/v3`); // bump when the response shape changes
     const hit = await caches.default.match(key);
     if (hit) return hit;
 

@@ -66,6 +66,36 @@
 		$("s-last").textContent = short(days[days.length - 1].date);
 	}
 
+	// Each country is shaded by the square root of its share of the top country's visits, so a
+	// country with a tenth of the readers still shows clearly. Hover (or tap) names it.
+	function map(rows) {
+		var figure = $("s-map");
+		var tip = $("s-map-tip");
+		var visits = {};
+		rows.forEach(function (r) { visits[r.name] = r.visits; });
+		var most = Math.max.apply(null, [1].concat(rows.map(function (r) { return r.visits; })));
+		figure.querySelectorAll("path[data-c]").forEach(function (shape) {
+			var n = visits[shape.getAttribute("data-c")] || 0;
+			shape.classList.toggle("is-read", n > 0);
+			shape.style.setProperty("--shade", String(0.2 + 0.8 * Math.sqrt(n / most)));
+		});
+		figure.querySelector("svg").setAttribute("aria-hidden", "true");
+		var hide = function () { tip.hidden = true; };
+		figure.onpointermove = figure.onpointerdown = function (e) {
+			var shape = e.target.closest && e.target.closest("path[data-c]");
+			if (!shape) return hide();
+			var code = shape.getAttribute("data-c");
+			var n = visits[code] || 0;
+			tip.textContent = country(code) + ": " + fmt(n) + (n === 1 ? " visit" : " visits");
+			tip.hidden = false;
+			var box = figure.getBoundingClientRect();
+			var x = e.clientX - box.left;
+			tip.style.left = Math.min(Math.max(x, tip.offsetWidth / 2), box.width - tip.offsetWidth / 2) + "px";
+			tip.style.top = e.clientY - box.top + "px";
+		};
+		figure.onpointerleave = hide;
+	}
+
 	fetch(STATS_URL)
 		.then(function (res) {
 			if (!res.ok) throw new Error(res.status);
@@ -78,7 +108,8 @@
 			$("s-views").textContent = fmt(s.month.views);
 			daily(s.daily);
 			list($("l-refs"), s.referrers);
-			list($("l-countries"), s.countries, country);
+			map(s.countries);
+			list($("l-countries"), s.countries.slice(0, 8), country);
 			list($("l-devices"), s.devices, function (d) { return DEVICE[d] || d; });
 			list($("l-browsers"), s.browsers, spaced);
 			$("s-updated").textContent = "Updated " + new Date(s.updated).toLocaleString() + ".";
