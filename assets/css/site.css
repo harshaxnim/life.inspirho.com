@@ -79,3 +79,148 @@
 @media screen and (min-width: 44.375em) {
 	.post-list .post-date { display: inline; float: right; margin-left: 1em; line-height: 2.2; }
 }
+
+/* Footer: "/" between the hosting credit and the Analytics link, like the one after the site title. */
+.site-info .stats-link:before {
+	content: "\002f";
+	display: inline-block;
+	font-family: Montserrat, sans-serif;
+	opacity: 0.7;
+	padding: 0 0.538461538em 0 0.230769231em;
+}
+
+/* Analytics page (/analytics/): ink-only, set like the "All" page's year headings and lists. */
+.stats-status { color: #686868; font-style: italic; }
+
+.stat-tiles {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: 0.875em;
+	margin: 0 0 3.5em;
+}
+
+.stat-tiles > div {
+	border: 1px solid #d1d1d1;
+	border-radius: 2px;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between; /* numbers line up even when a label wraps */
+	padding: 1em 1.125em 0.875em;
+}
+
+.stat-tiles dt {
+	color: #686868;
+	font-family: Montserrat, "Helvetica Neue", sans-serif;
+	font-size: 0.75rem;
+	font-weight: 400;
+	letter-spacing: 0.046875em;
+	line-height: 1.4;
+	text-transform: uppercase;
+}
+
+.stat-tiles dd {
+	color: #1a1a1a;
+	font-family: Montserrat, "Helvetica Neue", sans-serif;
+	font-size: 2rem;
+	font-variant-numeric: tabular-nums;
+	font-weight: 700;
+	line-height: 1.3;
+	margin: 0.25em 0 0;
+}
+
+/* Section headings: same treatment as the year headings on the All page. */
+.entry-content .stats-h {
+	font-family: Montserrat, "Helvetica Neue", sans-serif;
+	font-size: 1rem;
+	letter-spacing: 0.046875em;
+	margin: 0 0 0.875em;
+	text-transform: uppercase;
+}
+
+.stats-bars {
+	align-items: flex-end;
+	border-bottom: 1px solid #1a1a1a;
+	display: flex;
+	gap: 2px;
+	height: 160px;
+}
+
+.stats-bar {
+	background: #1a1a1a;
+	border-radius: 4px 4px 0 0;
+	flex: 1;
+	height: max(var(--h), 2px);
+	opacity: 0.8;
+}
+
+.stats-bar:hover,
+.stats-bar:focus { opacity: 1; outline: none; background: #666666; }
+.stats-bar:focus-visible { outline: 1px dotted #1a1a1a; outline-offset: 2px; }
+
+.stats-axis {
+	color: #686868;
+	display: flex;
+	font-family: Montserrat, "Helvetica Neue", sans-serif;
+	font-size: 0.8125rem;
+	gap: 1em;
+	justify-content: space-between;
+	margin: 0.4375em 0 0;
+}
+
+.stats-axis #s-readout { color: #1a1a1a; font-weight: 700; text-align: center; }
+
+.stat-lists {
+	display: grid;
+	gap: 2.625em 3.5em;
+	grid-template-columns: minmax(0, 1fr);
+	margin: 3.5em 0;
+}
+
+.stat-list {
+	list-style: none;
+	margin: 0;
+}
+
+.stat-list li {
+	border-top: 1px solid #d1d1d1;
+	display: flex;
+	gap: 1em;
+	justify-content: space-between;
+	padding: 0.3em 0.5em;
+	position: relative;
+	z-index: 0;
+}
+
+.stat-list li:last-child { border-bottom: 1px solid #d1d1d1; }
+
+/* The grey band behind each row is that row's share of the top entry. */
+.stat-list li:before {
+	background: #f1f1f1;
+	content: "";
+	inset: 0 auto 0 0;
+	position: absolute;
+	width: var(--w);
+	z-index: -1;
+}
+
+.stat-list li span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.stat-list li b {
+	font-family: Montserrat, "Helvetica Neue", sans-serif;
+	font-size: 0.875rem;
+	font-variant-numeric: tabular-nums;
+	font-weight: 400;
+	line-height: 2;
+}
+
+.stat-list li.empty { color: #686868; font-style: italic; }
+.stat-list li.empty:before { display: none; }
+
+.stats-note { color: #686868; font-size: 0.875em; }
+
+/* Tablet breakpoint and up: four tiles in a row, lists two by two. */
+@media screen and (min-width: 44.375em) {
+	.stat-tiles { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+	.stat-tiles dd { font-size: 1.75rem; }
+	.stat-lists { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}

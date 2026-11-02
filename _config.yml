@@ -19,4 +19,4 @@ plugins:
 twitter:
   username: harshaxnim
 
-exclude: [README.md, Gemfile, Gemfile.lock, vendor, docs, dns]
+exclude: [README.md, Gemfile, Gemfile.lock, vendor, docs, dns, stats-worker]

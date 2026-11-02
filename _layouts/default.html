@@ -43,5 +43,9 @@ var CrayonSyntaxStrings = {"copy":"Press %s to Copy, %s to Paste","minimize":"Cl
 <script src="{{ '/assets/twentysixteen/js/functions.js' | relative_url }}"></script>
 <script src="{{ '/assets/twentysixteen/js/skip-link-focus-fix.js' | relative_url }}"></script>
 <script src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-chtml.js"></script>
+{%- if jekyll.environment == "production" %}
+<!-- Cloudflare Web Analytics (cookieless); counts are public at /analytics/. Left out of local previews. -->
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "8e0590552fff403ab6b59e613913730e"}'></script>
+{%- endif %}
 </body>
 </html>

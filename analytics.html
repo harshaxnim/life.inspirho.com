@@ -1,0 +1,32 @@
+---
+layout: page
+title: Analytics
+permalink: /analytics/
+description: Live, public traffic numbers for inspirho.com. Visits, referrers, countries and devices, refreshed every ten minutes.
+---
+{%- comment -%} Public traffic numbers, served as JSON by the stats Worker (stats-worker/) and drawn by assets/js/analytics.js. {%- endcomment -%}
+<p>Who wanders by this weblog, counted without cookies and laid out for anyone to see. Nothing here follows you around; it only tallies that someone came by.</p>
+
+<p class="stats-status" id="stats-status">Counting&hellip;</p>
+
+<dl class="stat-tiles">
+	<div><dt>Visits, last 24 hours</dt><dd id="s-day">&mdash;</dd></div>
+	<div><dt>Visits, last 7 days</dt><dd id="s-week">&mdash;</dd></div>
+	<div><dt>Visits, last 30 days</dt><dd id="s-month">&mdash;</dd></div>
+	<div><dt>Page views, last 30 days</dt><dd id="s-views">&mdash;</dd></div>
+</dl>
+
+<h2 class="stats-h">Daily visits</h2>
+<div class="stats-bars" id="s-daily" role="group" aria-label="Visits per day, last 30 days"></div>
+<div class="stats-axis"><span id="s-first"></span><span id="s-readout" aria-live="polite"></span><span id="s-last"></span></div>
+
+<div class="stat-lists">
+	<section><h3 class="stats-h">Where they come from</h3><ol class="stat-list" id="l-refs"></ol></section>
+	<section><h3 class="stats-h">Countries</h3><ol class="stat-list" id="l-countries"></ol></section>
+	<section><h3 class="stats-h">Devices</h3><ol class="stat-list" id="l-devices"></ol></section>
+	<section><h3 class="stats-h">Browsers</h3><ol class="stat-list" id="l-browsers"></ol></section>
+</div>
+
+<p class="stats-note">Counts come from Cloudflare Web Analytics, which sets no cookies and doesn&rsquo;t fingerprint. Readers whose content blockers stop its script aren&rsquo;t counted, so the real numbers are a little higher, and there&rsquo;s no time-on-page figure because the service doesn&rsquo;t measure one. Last 30 days, refreshed every 10 minutes. <span id="s-updated"></span></p>
+
+<script src="{{ '/assets/js/analytics.js' | relative_url }}" defer></script>
